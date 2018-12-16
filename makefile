@@ -1,22 +1,29 @@
 CXX=clang++
-CXXFLAGS=-std=c++17 -I opengl
+CXXFLAGS=--std=c++17 -I include/opengl
 LIBNAME=libopengl-wrapper
 libdir=/usr/local/lib
 includedir=/usr/local/include
 
-all: static_lib
+vpath %.cpp src
+vpath %.hpp include/opengl
 
-.PHONY: static_lib
-static_lib: internal.o debug.o
-	$(AR) rcs $(LIBNAME).a $^
+.PHONY: all
+all: $(LIBNAME).a
 
-%.o: %.cpp
-	$(COMPILE.cc) $<
+%.hpp:
+	
+%.cpp:
+	
+$(LIBNAME).a: internal.o debug.o
+	$(AR) rcs $@ $^
+
+internal.o: internal.cpp %.hpp
+debug.o: debug.cpp debug.hpp
 
 .PHONY: install
 install: all
 	install $(LIBNAME).a $(libdir)
-	cp -r opengl $(includedir)
+	cp -r include/opengl $(includedir)
 
 .PHONY: clean
 clean:
