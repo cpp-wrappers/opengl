@@ -18,3 +18,7 @@ install: all
 	install $(LIBNAME).a $(libdir)
 	cp -r opengl $(includedir)
 
+.PHONY: clean
+clean:
+	rm -rf $(LIBNAME).a internal.o debug.o
+
