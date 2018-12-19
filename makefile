@@ -1,4 +1,3 @@
-CXX=clang++
 CXXFLAGS=--std=c++17 -I include/opengl
 LIBNAME=libopengl-wrapper
 libdir=/usr/local/lib

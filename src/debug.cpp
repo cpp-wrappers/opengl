@@ -7,10 +7,6 @@ namespace gl {
 	}
 }
 
-void gl::debug_message_callback(internal::debug_callback callback, const void *user_param) {
-	internal::debug_message_callback(callback, user_param);
-}
-
 void gl::debug_message_callback(void(callback)(std::string message), const void *user_param) {
 	internal::callback_message = callback;
 

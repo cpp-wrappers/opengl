@@ -22,6 +22,12 @@ namespace gl {
 	};
 
 	namespace internal {
+		class holder {
+			holder(){}
+		public:
+			//static 
+		};
+
 		typedef void (debug_callback)(message_source source, message_type type, unsigned id,
 			message_severity severity, unsigned length, const char *message,
 			const void *user_param);
@@ -29,7 +35,10 @@ namespace gl {
 		void debug_message_callback(debug_callback, const void *user_param);
 	}
 
-	void debug_message_callback(internal::debug_callback callback, const void *user_param = nullptr);
+	void inline debug_message_callback(internal::debug_callback callback, const void *user_param = nullptr) {
+		internal::debug_message_callback(callback, user_param);
+	}
+
 	void debug_message_callback(void(callback)(std::string message), const void *user_param = nullptr);
 	void debug_message_callback(void(callback)(message_type type, std::string message), const void *user_param = nullptr);
 }
