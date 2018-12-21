@@ -12,9 +12,8 @@ all: $(LIBNAME).a
 %.hpp:
 	
 %.cpp:
-	
-$(LIBNAME).a: internal.o debug.o
-	$(AR) rcs $@ $^
+
+$(LIBNAME).a: $(LIBNAME).a(internal.o) $(LIBNAME).a(debug.o)
 
 internal.o: internal.cpp %.hpp
 debug.o: debug.cpp debug.hpp
