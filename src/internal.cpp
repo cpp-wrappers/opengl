@@ -8,9 +8,44 @@
 #include "shader.hpp"
 #include "texture.hpp"
 #include "context.hpp"
+#include <stdexcept>
+
+namespace gl {
+namespace internal {
+	thread_local context* current_context;
+
+	void set_current_context(context* c) { current_context = c; }
+	context* get_current_context() { return current_context; }
+
+	bool supports(int ma, int mi) {
+		return
+		current_context->get_major() > ma
+		||
+		(current_context->get_major() == ma
+		&&
+		current_context->get_minor() >= mi
+		);
+	}
+
+	void require(int ma, int mi, std::string name) {
+		if(!supports(ma, mi))
+			throw std::runtime_error("Unsupported gl function \""
+			+ name
+			+ "\", need GL "
+			+ std::to_string(ma)
+			+ "."
+			+ std::to_string(mi));
+
+	}
+}
+}
 
 void gl::internal::init() {
 	glewInit();
+}
+
+void gl::internal::get_intergerv(unsigned pname, int*data) {
+	glGetIntegerv(pname, data);
 }
 
 // Buffer
@@ -180,11 +215,21 @@ void gl::internal::delete_textures(unsigned n, unsigned* textures) {
 }
 
 void gl::internal::texture_parameteri(unsigned texture, unsigned pname, int param) {
+	gl::internal::require(4, 5, "glTextureParameteri");
 	glTextureParameteri(texture, pname, param);
 }
 
+void gl::internal::tex_parameteri(unsigned target, unsigned pname, int param) {
+	glTexParameteri(target, pname, param);
+}
+
 void gl::internal::get_texture_level_parameteriv(unsigned texture, int level, unsigned pname, int* params) {
+	gl::internal::require(4, 5, "glGetTextureLevelParameteriv");
 	glGetTextureLevelParameteriv(texture, level, pname, params);
+}
+
+void gl::internal::get_tex_level_parameteriv(unsigned target, int level, unsigned pname, int* params) {
+	glGetTexLevelParameteriv(target, level, pname, params);
 }
 
 void gl::internal::tex_image_2d(unsigned target, int level, int internalformat,
@@ -204,5 +249,6 @@ void gl::internal::active_texture(unsigned texture) {
 
 // Debug
 void gl::internal::debug_message_callback(debug_callback callback, const void *user_param) {
+	require(4, 3, "glDebugMessageCallback");
 	glDebugMessageCallback((GLDEBUGPROC)callback, user_param);
 }

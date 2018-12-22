@@ -50,6 +50,13 @@ namespace gl {
 			link();
 			detach_(shs...);
 		}
+
+		template<class... Shaders>
+		program(Shaders&&... shs):program() {
+			attach_(shs...);//  see below
+			link();
+			detach_(shs...);
+		}
 	public:
 		template<class... Shaders>
 		void attach(Shaders&... shaders) {
@@ -180,6 +187,11 @@ namespace gl {
 		template<class T, int C, int R, class T2>
 		void uniform(unsigned location, T2& value) const {
 			uniform<T, C, R, T2>(location, 1, false, &value);
+		}
+
+		template<class T, int C, int R, class T2>
+		void uniform(unsigned location, T2&& value) const {
+			uniform<T, C, R, T2>(location, value);
 		}
 
 	};

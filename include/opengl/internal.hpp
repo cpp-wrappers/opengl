@@ -1,8 +1,14 @@
 #pragma once
 #include <memory>
+#include "context.hpp"
 
 namespace gl {
+	class context;
+
 	namespace internal {
+		void set_current_context(context* c);
+		context* get_current_context();
+
 		template<class T>
 		std::shared_ptr<T> view(unsigned name) {
 			T* ptr = new T(name);
@@ -28,5 +34,9 @@ namespace gl {
 				return 0x1406;
 			else std::exception();
 		}
+	}
+
+	const inline context* current_context() {
+		return internal::get_current_context();
 	}
 }

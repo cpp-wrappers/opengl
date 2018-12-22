@@ -9,7 +9,9 @@ namespace gl {
 		void delete_textures(unsigned n, unsigned* textures);
 
 		void texture_parameteri(unsigned texture, unsigned pname, int param);
+		void tex_parameteri(unsigned target, unsigned pname, int param);
 		void get_texture_level_parameteriv(unsigned texture, int level, unsigned pname, int* params);
+		void get_tex_level_parameteriv(unsigned target, int level, unsigned pname, int* params);
 		void tex_image_2d(unsigned target, int level, int internalformat,
 			unsigned width, unsigned height, int border, unsigned format, unsigned type, const void* data);
 		void tex_sub_image_2d(unsigned target, int level, int xoffset,
@@ -68,12 +70,14 @@ namespace gl {
 
 		int get_level_parameter_i(unsigned pname, int level = 0) {
 			int result;
-			internal::get_texture_level_parameteriv(name, level, pname, &result);
+			bind();
+			internal::get_tex_level_parameteriv(name, level, pname, &result);
 			return result;
 		}
 
 		void parameter(unsigned pname, int value) {
-			gl::internal::texture_parameteri(name, pname, value);
+			bind();
+			gl::internal::tex_parameteri(name, pname, value);
 		}
 
 	public:

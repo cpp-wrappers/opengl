@@ -73,7 +73,7 @@ namespace gl {
 		std::enable_if_t<std::is_class_v<Container>>
 		data(Container container, buffer_usage usage = gl::buffer_usage::static_draw) {
 			bind();
-			internal::buffer_data(target, sizeof(Container::value_type)*(unsigned)container.size(), container.data(), usage);
+			internal::buffer_data(target, sizeof(typename Container::value_type)*(unsigned)container.size(), container.data(), usage);
 		}
 
 		template<class size_t_>
@@ -86,7 +86,7 @@ namespace gl {
 		template<class Container>
 		void sub_data(unsigned offset, Container container) {
 			bind();
-			internal::buffer_sub_data(target, offset, sizeof(Container::value_type)*(unsigned)container.size(), container.data());
+			internal::buffer_sub_data(target, offset, sizeof(typename Container::value_type)*(unsigned)container.size(), container.data());
 		}
 	};
 
