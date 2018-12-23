@@ -71,13 +71,13 @@ namespace gl {
 		int get_level_parameter_i(unsigned pname, int level = 0) {
 			int result;
 			bind();
-			internal::get_tex_level_parameteriv(name, level, pname, &result);
+			internal::get_tex_level_parameteriv(target, level, pname, &result);
 			return result;
 		}
 
 		void parameter(unsigned pname, int value) {
 			bind();
-			gl::internal::tex_parameteri(name, pname, value);
+			gl::internal::tex_parameteri(target, pname, value);
 		}
 
 	public:

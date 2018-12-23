@@ -110,6 +110,14 @@ void gl::internal::draw_arrays(unsigned mode, int first, unsigned count) {
 	glDrawArrays(mode, first, count);
 }
 
+void gl::internal::get_program_info_log(unsigned program, int buf_size, int *length, char *info_log) {
+	glGetProgramInfoLog(program, buf_size, length, info_log);
+}
+
+void gl::internal::get_programiv(unsigned program, unsigned pname, int *params ) {
+	glGetProgramiv(program, pname, params);
+}
+
 void gl::internal::uniform_1i(int location, int value) {
 	glUniform1i(location, value);
 }
@@ -178,6 +186,14 @@ void gl::internal::shader_source(unsigned shader, unsigned count, const char* co
 
 void gl::internal::compile_shader(unsigned shader) {
 	glCompileShader(shader);
+}
+
+void gl::internal::get_shaderiv(unsigned shader, unsigned pname, int* params) {
+	glGetShaderiv(shader, pname, params);
+}
+
+void gl::internal::get_shader_info_log(unsigned shader, unsigned buf_size, int* length, char* info_log) {
+	glGetShaderInfoLog(shader, buf_size, length, info_log);
 }
 
 // Core

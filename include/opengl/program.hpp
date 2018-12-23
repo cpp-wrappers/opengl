@@ -21,6 +21,8 @@ namespace gl {
 		int get_uniform_location(unsigned program, const char *name);
 		int get_attribute_location(unsigned program, const char *name);
 		void draw_arrays(unsigned mode, int first, unsigned count);
+		void get_program_info_log(unsigned program, int buf_size, int *length, char *info_log);
+		void get_programiv(unsigned program, unsigned pname, int *params );
 
 		void uniform_1i(int location, int value);
 		void uniform_1ui(int location, unsigned value);
@@ -103,6 +105,17 @@ namespace gl {
 	public:
 		void link() const {
 			internal::link_program(name);
+			int success;
+			internal::get_programiv(name, 0x8B82, &success);
+			if(!success) {
+				int length;
+				internal::get_programiv(name, 0x8B84, &length);
+				char* log = new char[length];
+				internal::get_program_info_log(name, length, nullptr, log);
+				std::string log_str{log};
+				delete[] log;
+				throw std::runtime_error(log_str);
+			}
 		}
 
 		void use() const {

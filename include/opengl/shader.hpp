@@ -8,6 +8,8 @@ namespace gl {
 		void delete_shader(unsigned shader);
 		void shader_source(unsigned shader, unsigned count, const char* const* string, const int* length);
 		void compile_shader(unsigned shader);
+		void get_shaderiv(unsigned shader, unsigned pname, int* params);
+		void get_shader_info_log(unsigned shader, unsigned buf_size, int* length, char* info_log);
 
 		enum shader_type : unsigned {
 			compute_shader = 0x91B9,
@@ -48,6 +50,17 @@ namespace gl {
 
 		shader& compile() {
 			internal::compile_shader(name);
+			int success;
+			internal::get_shaderiv(name, 0x8B81, &success);
+			if(!success) {
+				int length;
+				internal::get_shaderiv(name, 0x8B84, &length);
+				char* log = new char[length];
+				internal::get_shader_info_log(name, length, nullptr, log);
+				std::string log_str{log};
+				delete[] log;
+				throw std::runtime_error(log_str);
+			}
 			return *this;
 		}
 	};
