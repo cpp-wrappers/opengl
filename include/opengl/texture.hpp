@@ -119,7 +119,7 @@ namespace gl {
 
 		template<class Container>
 		void image(internal_format internalformat, unsigned w, unsigned h, pixel_format format, Container& data) {
-			image<Container::value_type>(internalformat, 0, w, h, format, &*data.begin());
+			image<typename Container::value_type>(internalformat, 0, w, h, format, &*data.begin());
 		}
 
 		template<class T>

@@ -25,6 +25,7 @@ namespace gl {
 		void get_programiv(unsigned program, unsigned pname, int *params );
 
 		void uniform_1i(int location, int value);
+		void uniform_2i(int location, int v1, int v2);
 		void uniform_1ui(int location, unsigned value);
 		void uniform_4f(int location, float f1, float f2, float f3, float f4);
 		void uniform_1iv(int location, unsigned count, const int* value);
@@ -144,6 +145,11 @@ namespace gl {
 		void uniform(unsigned location, int value) const {
 			use();
 			internal::uniform_1i(location, value);
+		}
+
+		void uniform(unsigned location, int v1, int v2) const {
+			use();
+			internal::uniform_2i(location, v1, v2);
 		}
 
 		void uniform(unsigned location, unsigned value) const {

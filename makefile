@@ -1,4 +1,5 @@
-CXXFLAGS=--std=c++17 -I include/opengl
+CXXFLAGS = --std=c++17
+CPPFLAGS = -I include/opengl
 LIBNAME=libopengl-wrapper
 SLB=$(LIBNAME).a
 libdir=/usr/local/lib
@@ -14,21 +15,17 @@ all: $(SLB)
 	
 %.cpp:
 
-$(SLB): $(SLB)(internal.o) $(SLB)(debug.o)
+srcs := internal.cpp debug.cpp
+objects := $(srcs:.cpp=.o)
 
-internal.o: \
-internal.cpp \
-internal.hpp \
-shader.hpp \
-program.hpp \
-bindable.hpp \
-buffer.hpp \
-core.hpp \
-debug.hpp \
-texture.hpp \
-vertex_array.hpp \
-with_name.hpp
-debug.o: debug.cpp debug.hpp
+%.d : %.cpp
+	@set -e; rm -f $@; \
+	$(CXX) -M $(CPPFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+include $(srcs:.cpp=.d)
+
+$(SLB): $(SLB)($(objects))
 
 .PHONY: install
 install: all
@@ -37,5 +34,5 @@ install: all
 
 .PHONY: clean
 clean:
-	rm -rf $(LIBNAME).a internal.o debug.o
+	rm -rf $(LIBNAME).a $(objects)
 

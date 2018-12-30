@@ -122,6 +122,10 @@ void gl::internal::uniform_1i(int location, int value) {
 	glUniform1i(location, value);
 }
 
+void gl::internal::uniform_2i(int location, int v1, int v2) {
+	glUniform2i(location, v1, v2);
+}
+
 void gl::internal::uniform_1ui(int location, unsigned value) {
 	glUniform1ui(location, value);
 }
@@ -265,6 +269,6 @@ void gl::internal::active_texture(unsigned texture) {
 
 // Debug
 void gl::internal::debug_message_callback(debug_callback callback, const void *user_param) {
-	require(4, 3, "glDebugMessageCallback");
-	glDebugMessageCallback((GLDEBUGPROC)callback, user_param);
+	//require(4, 3, "glDebugMessageCallbackARB");
+	glDebugMessageCallbackARB((GLDEBUGPROC)callback, user_param);
 }
