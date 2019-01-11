@@ -27,6 +27,7 @@ namespace gl {
 		void uniform_1i(int location, int value);
 		void uniform_2i(int location, int v1, int v2);
 		void uniform_1ui(int location, unsigned value);
+		void uniform_2f(int location, float f1, float f2);
 		void uniform_4f(int location, float f1, float f2, float f3, float f4);
 		void uniform_1iv(int location, unsigned count, const int* value);
 		void uniform_matrix_4fv(int location, unsigned count, bool transpose, const float* value);
@@ -142,6 +143,10 @@ namespace gl {
 			return internal::get_uniform_location(name, unifrom_name.c_str());
 		}
 
+		unsigned u_loc(std::string uniform_name) const {
+			return uniform_location(uniform_name);
+		}
+
 		void uniform(unsigned location, int value) const {
 			use();
 			internal::uniform_1i(location, value);
@@ -155,6 +160,11 @@ namespace gl {
 		void uniform(unsigned location, unsigned value) const {
 			use();
 			internal::uniform_1ui(location, value);
+		}
+
+		void uniform(unsigned location, float v1, float v2) const {
+			use();
+			internal::uniform_2f(location, v1, v2);
 		}
 
 		void uniform(unsigned location, float v1, float v2, float v3, float v4) const {

@@ -20,35 +20,45 @@ namespace gl {
 
 	class program;
 
-	class shader :public with_name {
-		friend program;
+	class shader : public with_name {
 	protected:
-		internal::shader_type type;
-
-		shader(internal::shader_type type):with_name(internal::create_shader(type)), type{ type } {}
-
-		shader(internal::shader_type type, std::string src):shader(type) {
-			source(src);
-			compile();
-		}
+		using with_name::with_name;
 	public:
 		shader(shader&) = delete;
 		shader& operator=(shader&) = delete;
-		shader(shader&& s) :with_name{ std::move(s) } { type = s.type; }
+		shader(shader&& s):with_name{ std::move(s) } {}
 
-		~shader() {
+		virtual void source(std::string src) = 0;
+		virtual shader& compile() = 0;
+	};
+
+	namespace internal {
+	template<internal::shader_type Type>
+	class shader_impl : public shader {
+		friend program;
+		static constexpr internal::shader_type type = Type;
+	public:
+		shader_impl():shader(internal::create_shader(type)) {}
+		shader_impl(shader_impl&& r):shader(std::move(r)){}
+
+		shader_impl(std::string src):shader_impl() {
+			source(src);
+			compile();
+		}
+
+		~shader_impl() {
 			if (name != invalid_name) {
 				internal::delete_shader(name);
 				invalidate_name();
 			}
 		}
 
-		void source(std::string src) {
+		void source(std::string src) override {
 			const char* c_str = src.c_str();
 			internal::shader_source(name, 1, &c_str, nullptr);
 		}
 
-		shader& compile() {
+		shader& compile() override {
 			internal::compile_shader(name);
 			int success;
 			internal::get_shaderiv(name, 0x8B81, &success);
@@ -64,12 +74,7 @@ namespace gl {
 			return *this;
 		}
 	};
-	class vertex_shader : public shader {
-	public:
-		vertex_shader(std::string src) :shader(internal::shader_type::vertex_shader, src) {}
-	};
-	class fragment_shader : public shader {
-	public:
-		fragment_shader(std::string src) :shader(internal::shader_type::fragment_shader, src) {}
-	};
+	}
+	using vertex_shader = internal::shader_impl<internal::vertex_shader>;
+	using fragment_shader = internal::shader_impl<internal::fragment_shader>;
 }

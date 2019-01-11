@@ -130,6 +130,10 @@ void gl::internal::uniform_1ui(int location, unsigned value) {
 	glUniform1ui(location, value);
 }
 
+void gl::internal::uniform_2f(int location, float f1, float f2) {
+	glUniform2f(location, f1, f2);
+}
+
 void gl::internal::uniform_4f(int location, float f1, float f2, float f3, float f4) {
 	glUniform4f(location, f1, f2, f3, f4);
 }

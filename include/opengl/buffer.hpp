@@ -2,6 +2,7 @@
 #include "with_name.hpp"
 #include "bindable.hpp"
 #include "internal.hpp"
+#include <utility>
 
 namespace gl {
 	namespace internal {
@@ -27,29 +28,45 @@ namespace gl {
 	};
 
 	class vertex_array;
-	class texture_2d;
 
-	class buffer : public with_name, bindable {
-		friend vertex_array;
-		friend texture_2d;
+	class buffer : public with_name, protected bindable {
 	protected:
-		internal::buffer_target target;
-		
+		using with_name::with_name;
+	public:
+		buffer(buffer&& r):with_name(std::forward<buffer>(r)) {}
+	};
+
+	namespace internal {
+	template<internal::buffer_target Tar>
+	class buffer_impl : public buffer {
+		friend vertex_array;
+		template<class T>
+		friend std::shared_ptr<T> view(unsigned name);
+		static constexpr internal::buffer_target target = Tar;
+
+		buffer_impl(unsigned name):buffer(name){}
+	protected:
 		void bind() override {
 			internal::bind_buffer(target, name);
 		}
+	public:
+		//using buffer::buffer;
 
-		buffer(buffer&& r) :with_name{ std::move(r) }, target{ r.target } { }
-
-		buffer(internal::buffer_target tar) : target{ tar } {
+		buffer_impl() {
 			internal::gen_buffers(1, &name);
 			bind();
 		}
 
-		buffer(unsigned name, internal::buffer_target tar) : with_name{ name }, target{ tar } {}
+		buffer_impl(buffer_impl&& r):buffer(std::forward<buffer_impl<Tar>>(r)){}
 
-	public:
-		~buffer() {
+		template<class Container>
+		buffer_impl(Container c) : buffer_impl() {
+			data<Container>(c);
+		}
+
+		//buffer(unsigned name, internal::buffer_target tar) : with_name{ name }, target{ tar } {}
+
+		~buffer_impl() {
 			if (name != invalid_name) {
 				internal::delete_buffers(1, &name);
 				invalidate_name();
@@ -89,22 +106,8 @@ namespace gl {
 			internal::buffer_sub_data(target, offset, sizeof(typename Container::value_type)*(unsigned)container.size(), container.data());
 		}
 	};
+	}
 
-	class array_buffer : public buffer {
-	public:
-		array_buffer(array_buffer&& r) :buffer(std::move(r)) {}
-
-		template<class Container>
-		array_buffer(Container c) : buffer(internal::buffer_target::array) {
-			data<Container>(c);
-		}
-		array_buffer(unsigned name) : buffer(name, internal::buffer_target::array) {}
-		array_buffer() : buffer(internal::buffer_target::array) {}
-	};
-
-	class element_array_buffer : public buffer {
-	public:
-		element_array_buffer(unsigned name) : buffer(name, internal::buffer_target::element_array) {}
-		element_array_buffer() : buffer(internal::buffer_target::element_array) {}
-	};
+	using array_buffer = internal::buffer_impl<internal::array>;
+	using element_array_buffer = internal::buffer_impl<internal::element_array>;
 }

@@ -51,21 +51,20 @@ namespace gl {
 		linear
 	};
 
-	class texture : public bindable, with_name {
+	class texture : public bindable, protected with_name {
 		friend void active_texture(texture& tex, unsigned index);
+	public:
+		using with_name::with_name;
+	};
 
+	namespace internal {
+	template<internal::texture_target Tar, unsigned Dim>
+	class texture_impl : public texture {
 	protected:
-		internal::texture_target target;
+		static constexpr internal::texture_target target = Tar;
 
 		void bind() override {
 			internal::bind_texture(target, name);
-		}
-
-		texture(texture&& tex) :with_name{ std::move(tex) }, target{ tex.target }{}
-
-		texture(internal::texture_target target) : target{ target } {
-			internal::gen_textures(1, &name);
-			bind();
 		}
 
 		int get_level_parameter_i(unsigned pname, int level = 0) {
@@ -79,10 +78,16 @@ namespace gl {
 			bind();
 			gl::internal::tex_parameteri(target, pname, value);
 		}
-
 	public:
+		using texture::texture;
+		texture_impl(texture_impl&& tex) : texture{ std::move(tex) } {}
 
-		~texture() {
+		texture_impl() {
+			internal::gen_textures(1, &name);
+			bind();
+		}
+
+		~texture_impl() {
 			if (name != invalid_name) {
 				internal::delete_textures(1, &name);
 				invalidate_name();
@@ -93,6 +98,10 @@ namespace gl {
 			return get_level_parameter_i(0x1000);
 		}
 
+		std::enable_if_t<Dim >= 2, unsigned> height() {
+			return get_level_parameter_i(0x1001);
+		}
+
 		void mag_filter(mag_filter filter) {
 			parameter(0x2800, (unsigned)filter);
 		}
@@ -100,34 +109,37 @@ namespace gl {
 		void min_filter(min_filter filter) {
 			parameter(0x2801, (unsigned)filter);
 		}
-	};
-
-	class texture_2d : public texture {
-	public:
-		texture_2d() : texture { internal::texture_target::texture_2d } {}
-		texture_2d(texture_2d&& t) : texture(std::move(t)) {}
-
-		unsigned height() {
-			return get_level_parameter_i(0x1001);
-		}
 
 		template<class T>
-		void image(internal_format internalformat, int level, unsigned width, unsigned height, pixel_format format, T* data) {
+		std::enable_if_t<Dim == 2> image(internal_format internalformat, int level, unsigned width, unsigned height, pixel_format format, T* data) {
 			bind();
 			gl::internal::tex_image_2d(target, level, internalformat, width, height, 0, format, internal::type_token<T>(), data);
 		}
 
 		template<class Container>
-		void image(internal_format internalformat, unsigned w, unsigned h, pixel_format format, Container& data) {
+		std::enable_if_t<Dim == 2> image(internal_format internalformat, unsigned w, unsigned h, pixel_format format, Container& data) {
 			image<typename Container::value_type>(internalformat, 0, w, h, format, &*data.begin());
 		}
 
 		template<class T>
-		void sub_image(int xoffset, int yoffset, int width, int height, pixel_format format, T* data) {
+		std::enable_if_t<Dim == 2> sub_image(int xoffset, int yoffset, int width, int height, pixel_format format, T* data) {
 			bind();
 			gl::internal::tex_sub_image_2d(target, 0, xoffset, yoffset, width, height, format, internal::type_token<T>(), data);
 		}
 	};
+	}
+
+	class texture_2d : public internal::texture_impl<internal::texture_target::texture_2d, 2> {
+	public:
+		using internal::texture_impl<internal::texture_target::texture_2d, 2>::texture_impl;
+	
+		template<class T>
+		inline T size() {
+			return T{width(), height()};
+	}
+	};
+	//using texture_2d = internal::texture_impl<internal::texture_target::texture_2d, 2>;
+	//#define texture_2d gl::internal::texture_impl<gl::internal::texture_target::texture_2d, 2>
 
 	inline void active_texture(texture& tex, unsigned index) {
 		tex.bind();

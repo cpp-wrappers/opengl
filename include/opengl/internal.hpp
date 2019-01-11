@@ -6,13 +6,17 @@ namespace gl {
 	class context;
 
 	namespace internal {
+
+		
 		void set_current_context(context* c);
 		context* get_current_context();
 
 		template<class T>
 		std::shared_ptr<T> view(unsigned name) {
-			T* ptr = new T(name);
-			return std::shared_ptr<T>(ptr, [](T* p) {p->invalidate_name();  delete p; });
+			return {
+				new T(name),
+				[](T* p) {p->invalidate_name();  delete p; }
+			};
 		}
 
 		template<class T>
