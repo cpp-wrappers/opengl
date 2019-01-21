@@ -43,7 +43,7 @@ namespace gl {
 			bind();
 		}
 
-		vertex_array(vertex_array&& v) :with_name{ std::move(v) } {}
+		vertex_array(vertex_array&& v) = default;
 
 		vertex_array(unsigned name) :with_name{ name } {}
 
