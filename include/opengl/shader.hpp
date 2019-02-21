@@ -26,7 +26,7 @@ namespace gl {
 	public:
 		shader(shader&) = delete;
 		shader& operator=(shader&) = delete;
-		shader(shader&& s):with_name{ std::move(s) } {}
+		shader(shader&& s) = default;
 
 		virtual void source(std::string src) = 0;
 		virtual shader& compile() = 0;
@@ -39,7 +39,7 @@ namespace gl {
 		static constexpr internal::shader_type type = Type;
 	public:
 		shader_impl():shader(internal::create_shader(type)) {}
-		shader_impl(shader_impl&& r):shader(std::move(r)){}
+		shader_impl(shader_impl&& r) = default;
 
 		shader_impl(std::string src):shader_impl() {
 			source(src);

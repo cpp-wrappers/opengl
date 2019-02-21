@@ -1,4 +1,4 @@
-CXXFLAGS = --std=c++17
+override CXXFLAGS += --std=c++17
 CPPFLAGS = -I include/opengl
 LIBNAME=opengl-wrapper
 libfile=lib$(LIBNAME).a

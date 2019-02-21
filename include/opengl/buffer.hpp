@@ -33,7 +33,7 @@ namespace gl {
 	protected:
 		using with_name::with_name;
 	public:
-		buffer(buffer&& r):with_name(std::forward<buffer>(r)) {}
+		buffer(buffer&& r) = default;
 	};
 
 	namespace internal {
@@ -57,7 +57,7 @@ namespace gl {
 			bind();
 		}
 
-		buffer_impl(buffer_impl&& r):buffer(std::forward<buffer_impl<Tar>>(r)){}
+		buffer_impl(buffer_impl&& r) = default;
 
 		template<class Container>
 		buffer_impl(Container c) : buffer_impl() {

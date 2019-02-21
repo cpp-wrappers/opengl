@@ -118,23 +118,27 @@ void gl::internal::get_programiv(unsigned program, unsigned pname, int *params )
 	glGetProgramiv(program, pname, params);
 }
 
-void gl::internal::uniform_1i(int location, int value) {
+void gl::internal::uniform(int location, int value) {
 	glUniform1i(location, value);
 }
 
-void gl::internal::uniform_2i(int location, int v1, int v2) {
+void gl::internal::uniform(int location, int v1, int v2) {
 	glUniform2i(location, v1, v2);
 }
 
-void gl::internal::uniform_1ui(int location, unsigned value) {
+void gl::internal::uniform(int location, unsigned value) {
 	glUniform1ui(location, value);
 }
 
-void gl::internal::uniform_2f(int location, float f1, float f2) {
+void gl::internal::uniform(int location, float f1) {
+	glUniform1f(location, f1);
+}
+
+void gl::internal::uniform(int location, float f1, float f2) {
 	glUniform2f(location, f1, f2);
 }
 
-void gl::internal::uniform_4f(int location, float f1, float f2, float f3, float f4) {
+void gl::internal::uniform(int location, float f1, float f2, float f3, float f4) {
 	glUniform4f(location, f1, f2, f3, f4);
 }
 
