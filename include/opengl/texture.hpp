@@ -142,7 +142,7 @@ namespace gl {
 	//#define texture_2d gl::internal::texture_impl<gl::internal::texture_target::texture_2d, 2>
 
 	inline void active_texture(texture& tex, unsigned index) {
-		tex.bind();
 		internal::active_texture(0x84C0 + index);
+		tex.bind();
 	}
 }
