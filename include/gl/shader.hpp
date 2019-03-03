@@ -78,3 +78,7 @@ namespace gl {
 	using vertex_shader = internal::shader_impl<internal::vertex_shader>;
 	using fragment_shader = internal::shader_impl<internal::fragment_shader>;
 }
+
+#ifdef GL_INCLUDE 
+	#include "gl/shader.cpp"
+#endif

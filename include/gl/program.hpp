@@ -374,11 +374,6 @@ namespace gl {
 			uniform(u_loc(u_name), ts...);
 		}
 
-		/*template<class T>
-		void uniform(std::string u_name, T t) {
-			uniform<T>(u_loc(u_name), t);
-		}*/
-
 		template<class T, int C, int R, class... T0>
 		void uniform(std::string u_name, T0... ts) {
 			uniform<T, C, R, T0...>(u_loc(u_name), ts...);
@@ -386,3 +381,7 @@ namespace gl {
 
 	};
 }
+
+#ifdef GL_INCLUDE 
+	#include "gl/program.cpp"
+#endif

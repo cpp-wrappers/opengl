@@ -29,3 +29,7 @@ namespace gl {
 		inline void debug_message_callback(debug_callback, const void *user_param = nullptr);
 	}
 }
+
+#ifdef GL_INCLUDE 
+	#include "gl/debug.cpp"
+#endif

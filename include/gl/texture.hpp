@@ -1,5 +1,5 @@
 #pragma once
-#include "bindable.hpp"
+
 #include "with_name.hpp"
 
 namespace gl {
@@ -51,7 +51,7 @@ namespace gl {
 		linear
 	};
 
-	class texture : public bindable, protected with_name {
+	class texture : protected with_name {
 		friend void active_texture(texture& tex, uint index);
 	public:
 		using with_name::with_name;
@@ -63,7 +63,7 @@ namespace gl {
 	protected:
 		static constexpr internal::texture_target target = Tar;
 
-		void bind() override {
+		void bind() {
 			internal::bind_texture(target, name);
 		}
 
@@ -145,8 +145,13 @@ namespace gl {
 	//using texture_2d = internal::texture_impl<internal::texture_target::texture_2d, 2>;
 	//#define texture_2d gl::internal::texture_impl<gl::internal::texture_target::texture_2d, 2>
 
-	inline void active_texture(texture& tex, uint index) {
+	template<class Tex>
+	inline void active_texture(Tex& tex, uint index) {
 		internal::active_texture(0x84C0 + index);
 		tex.bind();
 	}
 }
+
+#ifdef GL_INCLUDE 
+	#include "gl/texture.cpp"
+#endif

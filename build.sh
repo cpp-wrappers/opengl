@@ -10,3 +10,20 @@ cxxargs=\
 
 cxxargs=$cxxargs $CXXARGS
 
+mkdir -p build
+$CXX $cxxargs -c \
+../src/gl/buffer.cpp \
+../src/gl/debug.cpp \
+../src/gl/program.cpp \
+../src/gl/shader.cpp \
+../src/gl/texture.cpp \
+../src/gl/vertex_array.cpp
+
+ar \
+buffer.o \
+debug.o \
+program.o \
+shader.o \
+texture.o \
+vertex_array.o
+

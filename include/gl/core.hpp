@@ -1,4 +1,5 @@
 #pragma once
+
 #include <type_traits>
 
 namespace gl {
@@ -42,3 +43,7 @@ namespace gl {
 		internal::blend_func(src, dest);
 	}
 }
+
+#ifdef GL_INCLUDE 
+	#include "gl/core.cpp"
+#endif

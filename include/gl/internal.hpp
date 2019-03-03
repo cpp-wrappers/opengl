@@ -1,6 +1,5 @@
 #pragma once
 #include <memory>
-#include "context.hpp"
 
 namespace gl {
 	class context;

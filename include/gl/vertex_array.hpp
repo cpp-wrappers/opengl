@@ -1,6 +1,5 @@
 #pragma once
 
-#include "bindable.hpp"
 #include "with_name.hpp"
 #include "buffer.hpp"
 #include "internal.hpp"
@@ -27,10 +26,10 @@ namespace gl {
 
 	class program;
 
-	class vertex_array : public bindable, with_name {
+	class vertex_array : with_name {
 		friend class program;
 
-		void bind() override { internal::bind_vertex_array(name); };
+		void bind() { internal::bind_vertex_array(name); };
 	public:
 		~vertex_array() {
 			if (name != invalid_name) {
@@ -87,3 +86,7 @@ namespace gl {
 		}
 	};
 }
+
+#ifdef GL_INCLUDE 
+	#include "gl/vertex_array.cpp"
+#endif

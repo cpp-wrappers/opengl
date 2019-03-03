@@ -1,7 +1,6 @@
 #pragma once
 
 #include "with_name.hpp"
-#include "bindable.hpp"
 #include "internal.hpp"
 #include <utility>
 
@@ -30,7 +29,7 @@ namespace gl {
 
 	class vertex_array;
 
-	class buffer : public with_name, protected bindable {
+	class buffer : public with_name {
 	protected:
 		using with_name::with_name;
 	public:
@@ -47,7 +46,7 @@ namespace gl {
 
 		buffer_impl(uint name):buffer(name){}
 	protected:
-		void bind() override {
+		void bind() {
 			internal::bind_buffer(target, name);
 		}
 	public:
@@ -112,3 +111,7 @@ namespace gl {
 	using array_buffer = internal::buffer_impl<internal::array>;
 	using element_array_buffer = internal::buffer_impl<internal::element_array>;
 }
+
+#ifdef GL_INCLUDE 
+	#include "gl/buffer.cpp"
+#endif
