@@ -1,6 +1,8 @@
 #include "debug.hpp"
 
-#ifdef GL_ALL_INCLUE_HEADER
+#ifdef GL_DEBUG_INCLUDE_HEADER
+    GL_DEBUG_INCLUDE_HEADER
+#elif GL_ALL_INCLUE_HEADER
     GL_ALL_INCLUE_HEADER
 #else
     #define GL_GLEXT_PROTOTYPES

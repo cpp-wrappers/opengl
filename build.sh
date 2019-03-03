@@ -13,6 +13,7 @@ cxxargs=$cxxargs $CXXARGS
 mkdir -p build
 $CXX $cxxargs -c \
 ../src/gl/buffer.cpp \
+../src/gl/core.cpp \
 ../src/gl/debug.cpp \
 ../src/gl/program.cpp \
 ../src/gl/shader.cpp \
@@ -21,6 +22,7 @@ $CXX $cxxargs -c \
 
 ar \
 buffer.o \
+core.o \
 debug.o \
 program.o \
 shader.o \

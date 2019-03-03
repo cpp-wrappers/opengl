@@ -2,13 +2,15 @@
 
 #include <type_traits>
 
+using uint = unsigned;
+
 namespace gl {
 	namespace internal {
-		void clear(uint mask);
-		void clear_color(float r, float g, float b, float a);
-		void viewport(int x, int y, uint w, uint h);
-		void enable(uint name);
-		void blend_func(uint source, uint destination);
+		inline void clear(uint mask);
+		inline void clear_color(float r, float g, float b, float a);
+		inline void viewport(int x, int y, uint w, uint h);
+		inline void enable(uint name);
+		inline void blend_func(uint source, uint destination);
 	}
 
 	inline void clear_color(float r, float g, float b, float a) {
