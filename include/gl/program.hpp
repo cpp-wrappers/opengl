@@ -1,7 +1,6 @@
 #pragma once
 #include "with_name.hpp"
 #include "primitive.hpp"
-#include "bindable.hpp"
 #include "vertex_array.hpp"
 #include <string>
 #include "shader.hpp"

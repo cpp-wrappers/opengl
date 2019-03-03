@@ -10,7 +10,7 @@
 #endif
 
 inline uint gl::internal::create_program() {
-    glCreateProgram();
+    return glCreateProgram();
 }
 
 inline void gl::internal::delete_program(uint name) {
@@ -34,11 +34,11 @@ inline void gl::internal::use_program(uint program) {
 }
 
 inline int gl::internal::get_uniform_location(uint program, const char *name) {
-    glGetUniformLocation(program, name);
+    return glGetUniformLocation(program, name);
 }
 
 inline int gl::internal::get_attribute_location(uint program, const char *name) {
-    glGetAttribLocation(program, name);
+    return glGetAttribLocation(program, name);
 }
 
 inline void gl::internal::draw_arrays(uint mode, int first, uint count) {

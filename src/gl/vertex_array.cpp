@@ -24,6 +24,7 @@ inline void gl::internal::delete_vertex_arrays(uint n, uint* arrays) {
 inline void gl::internal::vertex_attrib_pointer(uint index, int size, uint type, bool normalized, uint stride, const void* pointer) {
     glVertexAttribPointer(index, size, type, normalized, stride, pointer);
 }
+
 inline void gl::internal::vertex_attrib_i_pointer(uint index, int size, uint type, uint stride, const void *pointer) {
     glVertexAttribIPointer(index, size, type, stride, pointer);
 }

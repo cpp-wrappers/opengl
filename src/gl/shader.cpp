@@ -10,7 +10,7 @@
 #endif
 
 inline uint gl::internal::create_shader(uint type) {
-    glCreateShader(type);
+    return glCreateShader(type);
 }
 
 inline void gl::internal::delete_shader(uint shader) {

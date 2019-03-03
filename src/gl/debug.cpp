@@ -1,4 +1,4 @@
-#include "debug.hpp"
+#include "gl/debug.hpp"
 
 #ifdef GL_DEBUG_INCLUDE_HEADER
     GL_DEBUG_INCLUDE_HEADER

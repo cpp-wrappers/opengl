@@ -6,11 +6,13 @@ fi
 cxxargs=\
 "-c \
 --std=c++17 \
--I../../include"
+-I../include"
 
 cxxargs=$cxxargs $CXXARGS
 
 mkdir -p build
+cd build
+
 $CXX $cxxargs -c \
 ../src/gl/buffer.cpp \
 ../src/gl/core.cpp \
@@ -20,7 +22,7 @@ $CXX $cxxargs -c \
 ../src/gl/texture.cpp \
 ../src/gl/vertex_array.cpp
 
-ar \
+ar r libopenal-wrapper.a \
 buffer.o \
 core.o \
 debug.o \
