@@ -4,14 +4,14 @@
 
 namespace gl {
 	namespace internal {
-		unsigned create_shader(unsigned type);
-		void delete_shader(unsigned shader);
-		void shader_source(unsigned shader, unsigned count, const char* const* string, const int* length);
-		void compile_shader(unsigned shader);
-		void get_shaderiv(unsigned shader, unsigned pname, int* params);
-		void get_shader_info_log(unsigned shader, unsigned buf_size, int* length, char* info_log);
+		inline uint create_shader(uint type);
+		inline void delete_shader(uint shader);
+		inline void shader_source(uint shader, uint count, const char* const* string, const int* length);
+		inline void compile_shader(uint shader);
+		inline void get_shaderiv(uint shader, uint pname, int* params);
+		inline void get_shader_info_log(uint shader, uint buf_size, int* length, char* info_log);
 
-		enum shader_type : unsigned {
+		enum shader_type : uint {
 			compute_shader = 0x91B9,
 			vertex_shader = 0x8B31,
 			fragment_shader = 0x8B30

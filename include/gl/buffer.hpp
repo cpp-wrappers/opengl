@@ -1,4 +1,5 @@
 #pragma once
+
 #include "with_name.hpp"
 #include "bindable.hpp"
 #include "internal.hpp"
@@ -6,23 +7,23 @@
 
 namespace gl {
 	namespace internal {
-		enum buffer_target : unsigned {
+		enum buffer_target : uint {
 			array = 0x8892,
 			element_array = 0x8893,
 			pixel_pack = 0x88EB,
 			pixel_unpack = 0x88EC
 		};
 
-		void gen_buffers(unsigned n, unsigned* buffers);
-		void bind_buffer(unsigned target, unsigned buffer);
-		void delete_buffers(unsigned n, unsigned* buffers);
+		inline void gen_buffers(uint n, uint* buffers);
+		inline void bind_buffer(uint target, uint buffer);
+		inline void delete_buffers(uint n, uint* buffers);
 
-		void buffer_data(unsigned target, unsigned size, const void* data, unsigned usage);
-		void buffer_sub_data(unsigned target, unsigned offset, unsigned size, const void* data);
-		void get_buffer_parameteriv(unsigned target, unsigned pname, int* data);
+		inline void buffer_data(uint target, uint size, const void* data, uint usage);
+		inline void buffer_sub_data(uint target, uint offset, uint size, const void* data);
+		inline void get_buffer_parameteriv(uint target, uint pname, int* data);
 	}
 
-	enum buffer_usage : unsigned {
+	enum buffer_usage : uint {
 		static_draw = 0x88E4,
 		dynamic_draw = 0x88E8
 	};
@@ -41,10 +42,10 @@ namespace gl {
 	class buffer_impl : public buffer {
 		friend vertex_array;
 		template<class T>
-		friend std::shared_ptr<T> view(unsigned name);
+		friend std::shared_ptr<T> view(uint name);
 		static constexpr internal::buffer_target target = Tar;
 
-		buffer_impl(unsigned name):buffer(name){}
+		buffer_impl(uint name):buffer(name){}
 	protected:
 		void bind() override {
 			internal::bind_buffer(target, name);
@@ -64,7 +65,7 @@ namespace gl {
 			data<Container>(c);
 		}
 
-		//buffer(unsigned name, internal::buffer_target tar) : with_name{ name }, target{ tar } {}
+		//buffer(uint name, internal::buffer_target tar) : with_name{ name }, target{ tar } {}
 
 		~buffer_impl() {
 			if (name != invalid_name) {
@@ -90,7 +91,7 @@ namespace gl {
 		std::enable_if_t<std::is_class_v<Container>>
 		data(Container container, buffer_usage usage = gl::buffer_usage::static_draw) {
 			bind();
-			internal::buffer_data(target, sizeof(typename Container::value_type)*(unsigned)container.size(), container.data(), usage);
+			internal::buffer_data(target, sizeof(typename Container::value_type)*(uint)container.size(), container.data(), usage);
 		}
 
 		template<class size_t_>
@@ -101,9 +102,9 @@ namespace gl {
 		}
 
 		template<class Container>
-		void sub_data(unsigned offset, Container container) {
+		void sub_data(uint offset, Container container) {
 			bind();
-			internal::buffer_sub_data(target, offset, sizeof(typename Container::value_type)*(unsigned)container.size(), container.data());
+			internal::buffer_sub_data(target, offset, sizeof(typename Container::value_type)*(uint)container.size(), container.data());
 		}
 	};
 	}

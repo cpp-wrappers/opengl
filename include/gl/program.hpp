@@ -7,83 +7,81 @@
 #include "shader.hpp"
 
 namespace internal {
-	template<
-    	uint S,
-    	uint V = S,
-    	bool is =V*V==S
-	>
-	struct root_of_square {
-	    static const uint value = root_of_square<S, V-1>::value;
-	};
+template<
+	uint S,
+	uint V = S,
+	bool is =V*V==S
+>
+struct root_of_square {
+	static const uint value = root_of_square<S, V-1>::value;
+};
 
-	template<uint S, uint V>
-	struct root_of_square<S, V, true> {
-	    static const uint value = V;
-	};
+template<uint S, uint V>
+struct root_of_square<S, V, true> {
+	static const uint value = V;
+};
 
-	template<uint S, bool is>
-	struct root_of_square<S, 0, is> {
-		//static_assert(false, "S is not square of some value");
-	};
+template<uint S, bool is>
+struct root_of_square<S, 0, is> {};
 
-	template<class T, class... Ts>
-	struct first {
-		using type = T;
-	};
+template<class T, class... Ts>
+struct first {
+	using type = T;
+};
 
-	template<class T1, class... Ts>
-	struct they_are_same
-	: std::bool_constant<
-		std::is_same<T1, typename ::internal::first<Ts...>::type>::value
-		&&
-		they_are_same<Ts...>::value
-	>{};
+template<class T1, class... Ts>
+struct they_are_same
+: std::bool_constant<
+	std::is_same<T1, typename ::internal::first<Ts...>::type>::value
+	&&
+	they_are_same<Ts...>::value
+>{};
 
-	template<class T1>
-	struct they_are_same<T1> : std::bool_constant<true>{};
+template<class T1>
+struct they_are_same<T1> : std::bool_constant<true>{};
 
-	template<class T1, class... Ts>
-	struct they_are_arithmetic
-	: std::bool_constant<
-		std::is_arithmetic_v<T1>
-		&&
-		they_are_arithmetic<Ts...>::value
-	>{};
+template<class T1, class... Ts>
+struct they_are_arithmetic
+: std::bool_constant<
+	std::is_arithmetic_v<T1>
+	&&
+	they_are_arithmetic<Ts...>::value
+>{};
 
-	template<class T1>
-	struct they_are_arithmetic<T1> : std::bool_constant<std::is_arithmetic_v<T1>>{};
+template<class T1>
+struct they_are_arithmetic<T1> : std::bool_constant<std::is_arithmetic_v<T1>>{};
 
-	template<class T>
-	struct vector {
-		struct element {
-			using type =
-				typename std::remove_reference<
-				    decltype(T{}[0])
-		        >::type;
+template<class T>
+struct vector {
+	struct element {
+		using type =
+			typename std::remove_reference<
+				decltype(T{}[0])
+			>::type;
 
-			struct size
-			: std::integral_constant<uint, sizeof(type)>{};
-		};
-	
 		struct size
-		: std::integral_constant<uint, sizeof(T) / element::size::value>{};
+		: std::integral_constant<uint, sizeof(type)>{};
 	};
 
-	template<class T>
-	struct matrix {
-		struct element {
-			using type =
-				typename std::remove_reference<
-				    decltype(T{}[0][0])
-		        >::type;
+	struct size
+	: std::integral_constant<uint, sizeof(T) / element::size::value>{};
+};
 
-			struct size
-			: std::integral_constant<uint, sizeof(type)>{};
-		};
-	
+template<class T>
+struct matrix {
+	struct element {
+		using type =
+			typename std::remove_reference<
+				decltype(T{}[0][0])
+			>::type;
+
 		struct size
-		: std::integral_constant<uint, sizeof(T) / element::size::value>{};
+		: std::integral_constant<uint, sizeof(type)>{};
 	};
+
+	struct size
+	: std::integral_constant<uint, sizeof(T) / element::size::value>{};
+};
 
 }
 
@@ -92,34 +90,34 @@ namespace gl {
 	class program;
 
 	namespace internal {
-		extern void bind_vertex_array(unsigned array);
+		extern void bind_vertex_array(uint array);
 		
-		unsigned create_program();
-		void delete_program(unsigned name);
+		inline uint create_program();
+		inline void delete_program(uint name);
 
-		void attach_shader(unsigned program, unsigned shader);
-		void detach_shader(unsigned program, unsigned shader);
-		void link_program(unsigned program);
-		void use_program(unsigned program);
-		int get_uniform_location(unsigned program, const char *name);
-		int get_attribute_location(unsigned program, const char *name);
-		void draw_arrays(unsigned mode, int first, unsigned count);
-		void get_program_info_log(unsigned program, int buf_size, int *length, char *info_log);
-		void get_programiv(unsigned program, unsigned pname, int *params );
+		inline void attach_shader(uint program, uint shader);
+		inline void detach_shader(uint program, uint shader);
+		inline void link_program(uint program);
+		inline void use_program(uint program);
+		inline int get_uniform_location(uint program, const char *name);
+		inline int get_attribute_location(uint program, const char *name);
+		inline void draw_arrays(uint mode, int first, uint count);
+		inline void get_program_info_log(uint program, int buf_size, int *length, char *info_log);
+		inline void get_programiv(uint program, uint pname, int *params );
 
-		void uniform(int location, int value);
-		void uniform(int location, int v1, int v2);
-		void uniform(int location, unsigned value);
-		void uniform(int location, float f1);
-		void uniform(int location, float f1, float f2);
-		void uniform(int location, float f1, float f2, float f3, float f4);
-		void uniform_1iv(int location, unsigned count, const int* value);
-		void uniform_matrix_4fv(int location, unsigned count, bool transpose, const float* value);
+		inline void uniform(int location, int value);
+		inline void uniform(int location, int v1, int v2);
+		inline void uniform(int location, uint value);
+		inline void uniform(int location, float f1);
+		inline void uniform(int location, float f1, float f2);
+		inline void uniform(int location, float f1, float f2, float f3, float f4);
+		inline void uniform_1iv(int location, uint count, const int* value);
+		inline void uniform_matrix_4fv(int location, uint count, bool transpose, const float* value);
 	}
 
 	class program : public with_name {
 	protected:
-		static void draw_arrays_(primitive_type pt, unsigned start, size_t count);
+		static void draw_arrays_(primitive_type pt, uint start, size_t count);
 	public:
 		program():with_name(gl::internal::create_program()) {}
 		program(program&& p):with_name{ std::move(p) } { }
@@ -180,18 +178,18 @@ namespace gl {
 			internal::use_program(name);
 		}
 
-		void draw_arrays(primitive_type pt, unsigned start, unsigned count) const {
+		void draw_arrays(primitive_type pt, uint start, uint count) const {
 			use();
 			internal::draw_arrays(pt, start, count);
 		}
 
-		void draw_arrays(primitive_type pt, unsigned start, unsigned count, vertex_array& vao) const {
+		void draw_arrays(primitive_type pt, uint start, uint count, vertex_array& vao) const {
 			use();
 			internal::bind_vertex_array(vao.name);
 			internal::draw_arrays(pt, start, count);
 		}
 
-		unsigned attrib_location(std::string attrib_name) const {
+		uint attrib_location(std::string attrib_name) const {
 			return internal::get_attribute_location(name, attrib_name.c_str());
 		}
 
@@ -303,7 +301,7 @@ namespace gl {
 			//&&
 			//::internal::vector<T0>::size::value == C
 		>
-		uniform(unsigned location, unsigned count, bool transpose, const T0* value) const {
+		uniform(uint location, uint count, bool transpose, const T0* value) const {
 			//static_assert(C*R * sizeof(T) == sizeof(T2));
 			use();
 
@@ -325,7 +323,7 @@ namespace gl {
 				typename ::internal::matrix<T0>::element::type
 			>
 		>
-		uniform(unsigned location, T0 value) const {
+		uniform(uint location, T0 value) const {
 			uniform<T, C, R, T0>(location, 1, false, &value);
 		}
 
@@ -335,7 +333,7 @@ namespace gl {
 				typename std::remove_reference_t<decltype(T0{}[0][0])>
 			>
 		>
-		uniform(unsigned location, T0 value) const {
+		uniform(uint location, T0 value) const {
 			uniform<typename ::internal::matrix<T0>::element::type, C, R, T0>
 			(location, value);
 		}

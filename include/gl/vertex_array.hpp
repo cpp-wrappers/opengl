@@ -1,4 +1,5 @@
 #pragma once
+
 #include "bindable.hpp"
 #include "with_name.hpp"
 #include "buffer.hpp"
@@ -7,20 +8,20 @@
 
 namespace gl {
 	namespace internal {
-		void gen_vertex_arrays(unsigned n, unsigned* arrays);
-		void bind_vertex_array(unsigned array);
-		void delete_vertex_arrays(unsigned n, unsigned* arrays);
+		inline void gen_vertex_arrays(uint n, uint* arrays);
+		inline void bind_vertex_array(uint array);
+		inline void delete_vertex_arrays(uint n, uint* arrays);
 
-		void vertex_attrib_pointer(unsigned index, int size, unsigned type, bool normalized, unsigned stride, const void *pointer);
-		void vertex_attrib_i_pointer(unsigned index, int size, unsigned type, unsigned stride, const void *pointer);
-		void bind_vertex_buffer(unsigned bindingindex, unsigned buffer, unsigned offset, unsigned stride);
-		void enable_vertex_attrib_array(unsigned index);
-		void get_vertex_attribiv(unsigned index, unsigned pname, int *params);
+		inline void vertex_attrib_pointer(uint index, int size, uint type, bool normalized, uint stride, const void *pointer);
+		inline void vertex_attrib_i_pointer(uint index, int size, uint type, uint stride, const void *pointer);
+		inline void bind_vertex_buffer(uint bindingindex, uint buffer, uint offset, uint stride);
+		inline void enable_vertex_attrib_array(uint index);
+		inline void get_vertex_attribiv(uint index, uint pname, int *params);
 	}
 
 	namespace vertex_attribute {
-		typedef unsigned int size;
-		typedef unsigned int location;
+		typedef uint size;
+		typedef uint location;
 		typedef bool normalized;
 	}
 
@@ -45,14 +46,14 @@ namespace gl {
 
 		vertex_array(vertex_array&& v) = default;
 
-		vertex_array(unsigned name) :with_name{ name } {}
+		vertex_array(uint name) :with_name{ name } {}
 
-		std::shared_ptr<array_buffer> attrib_array_buffer(unsigned index) {
+		/*std::shared_ptr<array_buffer> attrib_array_buffer(uint index) {
 			bind();
-			unsigned buffer;
+			uint buffer;
 			internal::get_vertex_attribiv(index, 0x889F, (int*)&buffer);
 			return internal::view<array_buffer>(buffer);
-		}
+		}*/
 
 		template<class T, int size>
 		void attrib_pointer(vertex_attribute::location location, array_buffer& buff, vertex_attribute::normalized normalized = false) {
@@ -68,19 +69,19 @@ namespace gl {
 			internal::vertex_attrib_i_pointer(location, size, internal::type_token<T>(), 0, nullptr);
 		}
 
-		unsigned attrib_size(unsigned index) {
+		uint attrib_size(uint index) {
 			bind();
-			unsigned size;
+			uint size;
 			internal::get_vertex_attribiv(index, 0x8623, (int*)&size);
 			return size;
 		}
 
-		void bind_vertex_buffer(unsigned binding_index, buffer& buffer) {
+		void bind_vertex_buffer(uint binding_index, buffer& buffer) {
 			bind();
 			internal::bind_vertex_buffer(binding_index, ((with_name&)buffer).name, 0, 0);
 		}
 
-		void enable_attrib_array(unsigned index) {
+		void enable_attrib_array(uint index) {
 			bind();
 			internal::enable_vertex_attrib_array(index);
 		}

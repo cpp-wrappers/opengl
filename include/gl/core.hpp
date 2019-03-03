@@ -3,18 +3,18 @@
 
 namespace gl {
 	namespace internal {
-		void clear(unsigned mask);
+		void clear(uint mask);
 		void clear_color(float r, float g, float b, float a);
-		void viewport(int x, int y, unsigned w, unsigned h);
-		void enable(unsigned name);
-		void blend_func(unsigned source, unsigned destination);
+		void viewport(int x, int y, uint w, uint h);
+		void enable(uint name);
+		void blend_func(uint source, uint destination);
 	}
 
 	inline void clear_color(float r, float g, float b, float a) {
 		internal::clear_color(r, g, b, a);
 	}
 
-	enum class clear_buffer : unsigned {
+	enum class clear_buffer : uint {
 		color = 0x00004000,
 		depth = 0x00000100
 	};
@@ -22,10 +22,10 @@ namespace gl {
 	template<class... Mask>
 	void clear(Mask... masks) {
 		static_assert((std::is_same_v<gl::clear_buffer, Mask> && ...));
-		internal::clear((unsigned)(masks | ...));
+		internal::clear((uint)(masks | ...));
 	}
 
-	inline void viewport(int x, int y, unsigned w, unsigned h) {
+	inline void viewport(int x, int y, uint w, uint h) {
 		internal::viewport(x, y, w, h);
 	}
 
