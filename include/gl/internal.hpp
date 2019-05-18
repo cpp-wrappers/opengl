@@ -7,7 +7,7 @@ namespace gl {
 	namespace internal {
 
 		template<class T>
-		static unsigned constexpr type_token() {
+		unsigned constexpr type_token() {
 			if constexpr (std::is_same_v<T, int8_t>)
 				return 0x1400;
 			if constexpr (std::is_same_v<T, uint8_t>)

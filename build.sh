@@ -13,21 +13,17 @@ cxxargs=$cxxargs $CXXARGS
 mkdir -p build
 cd build
 
-$CXX $cxxargs -c \
-../src/gl/buffer.cpp \
-../src/gl/core.cpp \
-../src/gl/debug.cpp \
-../src/gl/program.cpp \
-../src/gl/shader.cpp \
-../src/gl/texture.cpp \
-../src/gl/vertex_array.cpp
+src_files=\
+'buffer '\
+'core '\
+'debug '\
+'program '\
+'shader '\
+'texture '\
+'vertex_array'
 
-ar r libopenal-wrapper.a \
-buffer.o \
-core.o \
-debug.o \
-program.o \
-shader.o \
-texture.o \
-vertex_array.o
+#for x in ${src_files}; do src_files0="../src/gl/${x}.cpp "; done
+$CXX $cxxargs -c `echo ${src_files} | sed 's/\w*/..\/src\/gl\/&.cpp/g'`
+
+ar -rs libopengl-wrapper.a `echo ${src_files} | sed 's/\w*/&.o/g'`
 
