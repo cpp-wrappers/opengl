@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+#include <type_traits>
 
 namespace gl {
 	class context;
@@ -7,7 +7,7 @@ namespace gl {
 	namespace internal {
 
 		template<class T>
-		unsigned constexpr type_token() {
+		constexpr uint type_token() {
 			if constexpr (std::is_same_v<T, int8_t>)
 				return 0x1400;
 			if constexpr (std::is_same_v<T, uint8_t>)
@@ -18,7 +18,6 @@ namespace gl {
 				return 0x1405;
 			if constexpr (std::is_same_v<T, float>)
 				return 0x1406;
-			else std::exception();
 		}
 	}
 }

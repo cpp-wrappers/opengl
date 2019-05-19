@@ -1,17 +1,6 @@
-if [[ -z $CXX ]]; then
-    echo you must specify CXX variable;
-    exit
-fi
-
-cxxargs=\
-"-c \
---std=c++17 \
--I../include"
-
-cxxargs=$cxxargs $CXXARGS
-
 mkdir -p build
 cd build
+rm *
 
 src_files=\
 'buffer '\
@@ -23,7 +12,9 @@ src_files=\
 'vertex_array'
 
 #for x in ${src_files}; do src_files0="../src/gl/${x}.cpp "; done
-$CXX $cxxargs -c `echo ${src_files} | sed 's/\w*/..\/src\/gl\/&.cpp/g'`
+$CXX $CXXFLAGS -c -std=c++17 \
+-I ../code \
+`echo ${src_files} | sed 's/\w*/..\/code\/gl\/&.cpp/g'`
 
-ar -rs libopengl-wrapper.a `echo ${src_files} | sed 's/\w*/&.o/g'`
+ar -rs libopengl-wrapper.a `echo ls | sed 's/\w*/&.o/g'`
 

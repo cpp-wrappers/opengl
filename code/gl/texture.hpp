@@ -120,7 +120,16 @@ public:
 	std::enable_if_t<Dim == 2 && std::is_pointer_v<T>>
 	image(int level, internal_format internalformat, uint width, uint height, pixel_format format, T data) {
 		bind();
-		gl::internal::tex_image_2d(target, level, internalformat, width, height, 0, format, internal::type_token<T>(), data);
+		gl::internal::tex_image_2d(
+			target,
+			level,
+			internalformat,
+			width,
+			height, 
+			0,
+			format,
+			internal::type_token<std::remove_pointer_t<T>>(), data
+		);
 	}
 
 	template<class T>
@@ -132,13 +141,20 @@ public:
 	template<class Container>
 	std::enable_if_t<Dim == 2 && !std::is_pointer_v<Container>>
 	image(int level, internal_format internalformat, uint w, uint h, pixel_format format, Container& data) {
-		image<typename Container::value_type>(internalformat, level, w, h, format, &*data.begin());
+		image<typename std::add_pointer_t<typename Container::value_type>>(
+			level,
+			internalformat,
+			w,
+			h,
+			format,
+			data.data()
+		);
 	}
 
 	template<class Container>
 	std::enable_if_t<Dim == 2 && !std::is_pointer_v<Container>>
 	image(internal_format internalformat, uint w, uint h, pixel_format format, Container& data) {
-		image<Container>(0, internalformat, w, h, format, &*data.begin());
+		image<Container>(0, internalformat, w, h, format, data);
 	}
 
 	template<class T>
