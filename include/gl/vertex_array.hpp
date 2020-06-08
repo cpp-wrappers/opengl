@@ -5,17 +5,20 @@
 #include "internal.hpp"
 #include "primitive.hpp"
 
-namespace gl {
-	namespace internal {
-		inline void gen_vertex_arrays(uint n, uint* arrays);
-		inline void bind_vertex_array(uint array);
-		inline void delete_vertex_arrays(uint n, uint* arrays);
+using uint = unsigned;
 
-		inline void vertex_attrib_pointer(uint index, int size, uint type, bool normalized, uint stride, const void *pointer);
-		inline void vertex_attrib_i_pointer(uint index, int size, uint type, uint stride, const void *pointer);
-		inline void bind_vertex_buffer(uint bindingindex, uint buffer, uint offset, uint stride);
-		inline void enable_vertex_attrib_array(uint index);
-		inline void get_vertex_attribiv(uint index, uint pname, int *params);
+namespace gl {
+	
+	namespace internal {
+		void gen_vertex_arrays(uint n, uint* arrays);
+		void bind_vertex_array(uint array);
+		void delete_vertex_arrays(uint n, uint* arrays);
+
+		void vertex_attrib_pointer(uint index, int size, uint type, bool normalized, uint stride, const void *pointer);
+		void vertex_attrib_i_pointer(uint index, int size, uint type, uint stride, const void *pointer);
+		void bind_vertex_buffer(uint bindingindex, uint buffer, uint offset, uint stride);
+		void enable_vertex_attrib_array(uint index);
+		void get_vertex_attribiv(uint index, uint pname, int *params);
 	}
 
 	namespace vertex_attribute {
@@ -46,13 +49,6 @@ namespace gl {
 		vertex_array(vertex_array&& v) = default;
 
 		vertex_array(uint name) :with_name{ name } {}
-
-		/*std::shared_ptr<array_buffer> attrib_array_buffer(uint index) {
-			bind();
-			uint buffer;
-			internal::get_vertex_attribiv(index, 0x889F, (int*)&buffer);
-			return internal::view<array_buffer>(buffer);
-		}*/
 
 		template<class T, int size>
 		void attrib_pointer(vertex_attribute::location location, array_buffer& buff, vertex_attribute::normalized normalized = false) {
@@ -86,7 +82,3 @@ namespace gl {
 		}
 	};
 }
-
-#ifdef GL_INCLUDE 
-	#include "gl/vertex_array.cpp"
-#endif

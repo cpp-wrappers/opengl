@@ -3,6 +3,7 @@
 #include "primitive.hpp"
 #include "vertex_array.hpp"
 #include <string>
+#include <stdexcept>
 #include "shader.hpp"
 
 namespace internal {
@@ -91,27 +92,27 @@ namespace gl {
 	namespace internal {
 		extern void bind_vertex_array(uint array);
 		
-		inline uint create_program();
-		inline void delete_program(uint name);
+		uint create_program();
+		void delete_program(uint name);
 
-		inline void attach_shader(uint program, uint shader);
-		inline void detach_shader(uint program, uint shader);
-		inline void link_program(uint program);
-		inline void use_program(uint program);
-		inline int get_uniform_location(uint program, const char *name);
-		inline int get_attribute_location(uint program, const char *name);
-		inline void draw_arrays(uint mode, int first, uint count);
-		inline void get_program_info_log(uint program, int buf_size, int *length, char *info_log);
-		inline void get_programiv(uint program, uint pname, int *params );
+		void attach_shader(uint program, uint shader);
+		void detach_shader(uint program, uint shader);
+		void link_program(uint program);
+		void use_program(uint program);
+		int get_uniform_location(uint program, const char *name);
+		int get_attribute_location(uint program, const char *name);
+		void draw_arrays(uint mode, int first, uint count);
+		void get_program_info_log(uint program, int buf_size, int *length, char *info_log);
+		void get_programiv(uint program, uint pname, int *params );
 
-		inline void uniform(int location, int value);
-		inline void uniform(int location, int v1, int v2);
-		inline void uniform(int location, uint value);
-		inline void uniform(int location, float f1);
-		inline void uniform(int location, float f1, float f2);
-		inline void uniform(int location, float f1, float f2, float f3, float f4);
-		inline void uniform_1iv(int location, uint count, const int* value);
-		inline void uniform_matrix_4fv(int location, uint count, bool transpose, const float* value);
+		void uniform(int location, int value);
+		void uniform(int location, int v1, int v2);
+		void uniform(int location, uint value);
+		void uniform(int location, float f1);
+		void uniform(int location, float f1, float f2);
+		void uniform(int location, float f1, float f2, float f3, float f4);
+		void uniform_1iv(int location, uint count, const int* value);
+		void uniform_matrix_4fv(int location, uint count, bool transpose, const float* value);
 	}
 
 	class program : public with_name {
@@ -380,7 +381,3 @@ namespace gl {
 
 	};
 }
-
-#ifdef GL_INCLUDE 
-	#include "gl/program.cpp"
-#endif

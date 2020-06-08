@@ -6,14 +6,14 @@ using uint = unsigned;
 
 namespace gl {
 	namespace internal {
-		inline void clear(uint mask);
-		inline void clear_color(float r, float g, float b, float a);
-		inline void viewport(int x, int y, uint w, uint h);
-		inline void enable(uint name);
-		inline void blend_func(uint source, uint destination);
+		void clear(uint mask);
+		void clear_color(float r, float g, float b, float a);
+		void viewport(int x, int y, uint w, uint h);
+		void enable(uint name);
+		void blend_func(uint source, uint destination);
 	}
 
-	inline void clear_color(float r, float g, float b, float a) {
+	void clear_color(float r, float g, float b, float a) {
 		internal::clear_color(r, g, b, a);
 	}
 
@@ -28,11 +28,11 @@ namespace gl {
 		internal::clear((uint)(masks | ...));
 	}
 
-	inline void viewport(int x, int y, uint w, uint h) {
+	void viewport(int x, int y, uint w, uint h) {
 		internal::viewport(x, y, w, h);
 	}
 
-	inline void enable_blending() {
+	void enable_blending() {
 		internal::enable(0x0BE2);
 	}
 
@@ -41,11 +41,7 @@ namespace gl {
 		one_minus_src_alpha
 	};
 
-	inline void blend_func(blending_factor src, blending_factor dest) {
+	void blend_func(blending_factor src, blending_factor dest) {
 		internal::blend_func(src, dest);
 	}
 }
-
-#ifdef GL_INCLUDE 
-	#include "gl/core.cpp"
-#endif

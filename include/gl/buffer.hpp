@@ -4,6 +4,8 @@
 #include "internal.hpp"
 #include <utility>
 
+using uint = unsigned;
+
 namespace gl {
 	namespace internal {
 		enum buffer_target : uint {
@@ -13,13 +15,13 @@ namespace gl {
 			pixel_unpack = 0x88EC
 		};
 
-		inline void gen_buffers(uint n, uint* buffers);
-		inline void bind_buffer(uint target, uint buffer);
-		inline void delete_buffers(uint n, uint* buffers);
+		void gen_buffers(uint n, uint* buffers);
+		void bind_buffer(uint target, uint buffer);
+		void delete_buffers(uint n, uint* buffers);
 
-		inline void buffer_data(uint target, uint size, const void* data, uint usage);
-		inline void buffer_sub_data(uint target, uint offset, uint size, const void* data);
-		inline void get_buffer_parameteriv(uint target, uint pname, int* data);
+		void buffer_data(uint target, uint size, const void* data, uint usage);
+		void buffer_sub_data(uint target, uint offset, uint size, const void* data);
+		void get_buffer_parameteriv(uint target, uint pname, int* data);
 	}
 
 	enum buffer_usage : uint {
@@ -111,7 +113,3 @@ namespace gl {
 	using array_buffer = internal::buffer_impl<internal::array>;
 	using element_array_buffer = internal::buffer_impl<internal::element_array>;
 }
-
-#ifdef GL_INCLUDE 
-	#include "gl/buffer.cpp"
-#endif

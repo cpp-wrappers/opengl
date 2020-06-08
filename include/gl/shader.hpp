@@ -4,12 +4,12 @@
 
 namespace gl {
 	namespace internal {
-		inline uint create_shader(uint type);
-		inline void delete_shader(uint shader);
-		inline void shader_source(uint shader, uint count, const char* const* string, const int* length);
-		inline void compile_shader(uint shader);
-		inline void get_shaderiv(uint shader, uint pname, int* params);
-		inline void get_shader_info_log(uint shader, uint buf_size, int* length, char* info_log);
+		uint create_shader(uint type);
+		void delete_shader(uint shader);
+		void shader_source(uint shader, uint count, const char* const* string, const int* length);
+		void compile_shader(uint shader);
+		void get_shaderiv(uint shader, uint pname, int* params);
+		void get_shader_info_log(uint shader, uint buf_size, int* length, char* info_log);
 
 		enum shader_type : uint {
 			compute_shader = 0x91B9,
@@ -78,7 +78,3 @@ namespace gl {
 	using vertex_shader = internal::shader_impl<internal::vertex_shader>;
 	using fragment_shader = internal::shader_impl<internal::fragment_shader>;
 }
-
-#ifdef GL_INCLUDE 
-	#include "gl/shader.cpp"
-#endif

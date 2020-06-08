@@ -1,8 +1,12 @@
 #pragma once
+
 #include <functional>
 #include <string>
 
+using uint = unsigned;
+
 namespace gl {
+
 	enum message_source : uint {
 	};
 
@@ -26,10 +30,6 @@ namespace gl {
 			const void *user_param);
 
 	namespace internal {
-		inline void debug_message_callback(debug_callback, const void *user_param = nullptr);
+		void debug_message_callback(debug_callback, const void *user_param = nullptr);
 	}
 }
-
-#ifdef GL_INCLUDE 
-	#include "gl/debug.cpp"
-#endif

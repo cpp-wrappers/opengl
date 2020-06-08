@@ -1,6 +1,8 @@
 #pragma once
 #include <type_traits>
 
+using uint = unsigned;
+
 namespace gl {
 	class context;
 

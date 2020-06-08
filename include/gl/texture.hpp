@@ -2,22 +2,24 @@
 
 #include "with_name.hpp"
 
+using uint = unsigned;
+
 namespace gl {
 namespace internal {
-	inline void gen_textures(uint n, uint* textures);
-	inline void bind_texture(uint target, uint texture);
-	inline void delete_textures(uint n, uint* textures);
+	void gen_textures(uint n, uint* textures);
+	void bind_texture(uint target, uint texture);
+	void delete_textures(uint n, uint* textures);
 
-	inline void texture_parameteri(uint texture, uint pname, int param);
-	inline void tex_parameteri(uint target, uint pname, int param);
-	inline void get_texture_level_parameteriv(uint texture, int level, uint pname, int* params);
-	inline void get_tex_level_parameteriv(uint target, int level, uint pname, int* params);
-	inline void tex_image_2d(uint target, int level, int internalformat,
+	void texture_parameteri(uint texture, uint pname, int param);
+	void tex_parameteri(uint target, uint pname, int param);
+	void get_texture_level_parameteriv(uint texture, int level, uint pname, int* params);
+	void get_tex_level_parameteriv(uint target, int level, uint pname, int* params);
+	void tex_image_2d(uint target, int level, int internalformat,
 		uint width, uint height, int border, uint format, uint type, const void* data);
-	inline void tex_sub_image_2d(uint target, int level, int xoffset,
+	void tex_sub_image_2d(uint target, int level, int xoffset,
 		int yoffset, uint width, uint height, uint format,
 		uint type, const void *data);
-	inline void active_texture(uint texture);
+	void active_texture(uint texture);
 
 	enum texture_target :uint {
 		texture_2d = 0x0DE1
@@ -172,18 +174,14 @@ public:
 	using internal::texture_impl<internal::texture_target::texture_2d, 2>::texture_impl;
 
 	template<class Dim2>
-		inline Dim2 size() {return Dim2{width(), height()};
+		Dim2 size() {return Dim2{width(), height()};
 	}
 };
 
 template<class Tex>
-inline void active_texture(Tex& tex, uint index) {
+void active_texture(Tex& tex, uint index) {
 	internal::active_texture(0x84C0 + index);
 	tex.bind();
 }
 
 }
-
-#ifdef GL_INCLUDE 
-	#include "gl/texture.cpp"
-#endif

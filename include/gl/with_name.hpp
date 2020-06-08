@@ -1,7 +1,10 @@
 #pragma once
 
 #include <memory>
+#include <limits>
 #include "internal.hpp"
+
+using uint = unsigned;
 
 namespace gl {
 
