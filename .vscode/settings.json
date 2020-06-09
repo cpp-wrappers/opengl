@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "numeric": "cpp",
+        "initializer_list": "cpp"
+    }
+}
