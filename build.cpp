@@ -1,36 +1,56 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "cpp_build/clang_driver.hpp"
+#include "cxx_exec/gcc_like_driver.hpp"
+#include "cxx_exec/environment.hpp"
+#include "clap/gnu_clap.hpp"
+#include "cxx_exec/ext/build/configuration.hpp"
+#include "cxx_exec/ar.hpp"
 
 using namespace std;
+using namespace filesystem;
+using namespace gcc_like_driver;
 
-void build(vector<string> args) {
-    if(!filesystem::exists("build"))
-        filesystem::create_directory("build");
+void exec(vector<string> args) {
+	string conf_name;
+	gnu::clap clap;
+	clap.option("configuration", conf_name);
+	clap.parse(args.begin(), args.end());
 
-    clang_driver::executor comp("clang++");
-    comp.std = &clang_driver::lang::std::cxx20;
-    comp.include_path("./include");
+	configuration conf = get_configuration(conf_name);
+
+    auto cc = environment::cxx_compile_command_builder();
+    cc.std(cxx20);
+    cc.include("include");
     vector<string> files {
         "buffer", "core",
         "debug", "program",
         "shader", "texture",
         "vertex_array"
     };
-    comp.args.push_back("-c");
+    cc.out_type(object_file);
+	
+	path build_conf = "build/"+conf_name;
+	path objects_p = build_conf/"objects";
+	create_directories(objects_p);
+	
+	vector<path> objects;
 
-    for_each(files.begin(), files.end(), [&](string src) {
-        comp.input_files = {"src/"+src+".cpp"};
-        comp.output = "build/"+src+".o";
+    for(auto src : files) {
+		path in = ("src/"+src+".cpp");
+		path out = objects_p/(src+".o");
 
-        if(comp.execute())
-            std::terminate();
-    });
+        cc.in(in);
+        cc.out(out);
+		conf.apply(cc);
 
-    program_executor ar("ar", {"-rv", "build/opengl-wrapper.a"});
-    for_each(files.begin(), files.end(), [&](string src) {
-        ar.args.push_back("build/"+src+".o");
-    });
-    ar.execute();
+       	environment::execute(cc);
+    	cc.clear_inputs();
+		objects.push_back(out);
+	}
+   	
+	environment::execute(
+   		ar::insert().to_archive(build_conf/"libopengl-wrapper.a").create_if_not_exists()
+		.members(objects.begin(), objects.end())
+	);
 }
