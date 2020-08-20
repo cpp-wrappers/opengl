@@ -13,7 +13,7 @@ namespace gl {
 		void blend_func(uint source, uint destination);
 	}
 
-	void clear_color(float r, float g, float b, float a) {
+	inline void clear_color(float r, float g, float b, float a) {
 		internal::clear_color(r, g, b, a);
 	}
 
@@ -28,11 +28,11 @@ namespace gl {
 		internal::clear((uint)(masks | ...));
 	}
 
-	void viewport(int x, int y, uint w, uint h) {
+	inline void viewport(int x, int y, uint w, uint h) {
 		internal::viewport(x, y, w, h);
 	}
 
-	void enable_blending() {
+	inline void enable_blending() {
 		internal::enable(0x0BE2);
 	}
 
@@ -41,7 +41,7 @@ namespace gl {
 		one_minus_src_alpha
 	};
 
-	void blend_func(blending_factor src, blending_factor dest) {
+	inline void blend_func(blending_factor src, blending_factor dest) {
 		internal::blend_func(src, dest);
 	}
 }

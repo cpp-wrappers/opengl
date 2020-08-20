@@ -1,11 +1,11 @@
 #include <vector>
 #include <string>
-#include <algorithm>
 #include "cxx_exec/gcc_like_driver.hpp"
 #include "cxx_exec/environment.hpp"
 #include "clap/gnu_clap.hpp"
-#include "cxx_exec/ext/build/configuration.hpp"
-#include "cxx_exec/ar.hpp"
+#include "cxx_exec/build/configuration.hpp"
+#include "cxx_exec/build/build.hpp"
+#include <ranges>
 
 using namespace std;
 using namespace filesystem;
@@ -15,42 +15,17 @@ void exec(vector<string> args) {
 	string conf_name;
 	gnu::clap clap;
 	clap.option("configuration", conf_name);
-	clap.parse(args.begin(), args.end());
+	clap.parse(args);
 
-	configuration conf = get_configuration(conf_name);
+	configuration conf = configuration::by_name(conf_name);
 
-    auto cc = environment::cxx_compile_command_builder();
-    cc.std(cxx20);
-    cc.include("include");
-    vector<string> files {
-        "buffer", "core",
-        "debug", "program",
-        "shader", "texture",
-        "vertex_array"
-    };
-    cc.out_type(object_file);
+    auto cc = environment::cxx_compile_command_builder().std(cxx20).include("include");
+	conf.apply(cc);
 	
 	path build_conf = "build/"+conf_name;
-	path objects_p = build_conf/"objects";
-	create_directories(objects_p);
-	
-	vector<path> objects;
+	path objects = build_conf/"objects";
 
-    for(auto src : files) {
-		path in = ("src/"+src+".cpp");
-		path out = objects_p/(src+".o");
-
-        cc.in(in);
-        cc.out(out);
-		conf.apply(cc);
-
-       	environment::execute(cc);
-    	cc.clear_inputs();
-		objects.push_back(out);
-	}
-   	
-	environment::execute(
-   		ar::insert().to_archive(build_conf/"libopengl-wrapper.a").create_if_not_exists()
-		.members(objects.begin(), objects.end())
-	);
+	sources{ ranges::subrange{directory_iterator{"src"}, directory_iterator{}} }
+		.compile_to_objects(objects, cc)
+		.to_thin_static_lib(build_conf, "opengl-wrapper");
 }
