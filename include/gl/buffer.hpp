@@ -32,6 +32,7 @@ namespace gl {
 	class vertex_array;
 
 	class buffer : public with_name {
+		friend class gl::vertex_array;
 	protected:
 		using with_name::with_name;
 	public:

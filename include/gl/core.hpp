@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <vector>
 
 using uint = unsigned;
 
@@ -28,8 +29,8 @@ namespace gl {
 		internal::clear((uint)(masks | ...));
 	}
 
-	inline void viewport(int x, int y, uint w, uint h) {
-		internal::viewport(x, y, w, h);
+	inline void viewport(std::pair<unsigned, unsigned> lower_left_corner, std::pair<unsigned, unsigned> size) {
+		internal::viewport(lower_left_corner.first, lower_left_corner.second, size.first, size.second);
 	}
 
 	inline void enable_blending() {

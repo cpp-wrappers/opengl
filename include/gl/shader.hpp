@@ -21,6 +21,7 @@ namespace gl {
 	class program;
 
 	class shader : public with_name {
+		friend class gl::program;
 	protected:
 		using with_name::with_name;
 	public:

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "with_name.hpp"
+#include "unified_math/vec.hpp"
+#include <type_traits>
+#include <ranges>
 
 using uint = unsigned;
 
@@ -21,18 +24,22 @@ namespace internal {
 		uint type, const void *data);
 	void active_texture(uint texture);
 
-	enum texture_target :uint {
+	enum texture_target : unsigned {
+		none = 0,
 		texture_2d = 0x0DE1
 	};
 }
 
 namespace internal {
-	template<internal::texture_target Tar, uint Dim>
-	class texture_impl;
+	template<texture_target Tar, unsigned Dim = 0>
+	struct texture;
 }
 
-template<internal::texture_target Tar, uint Dim>
-void active_texture(internal::texture_impl<Tar, Dim>& tex, uint index);
+template<class T>
+concept texture = std::is_base_of_v<internal::texture<internal::texture_target::none>, T>;
+
+template<texture Texture>
+void active_texture(Texture& tex, uint index);
 
 enum internal_format : uint {
 	rgba8 = 0x8058
@@ -50,146 +57,121 @@ enum wrap_mode : uint {
 	repeat = 0x2901
 };
 
-enum class mag_filter {
+enum filter {
 	nearest = 0x2600,
 	linear
-};
-
-enum class min_filter {
-	nearest = 0x2600,
-	linear
-};
-
-class texture : protected with_name {
-	//friend void active_texture(texture& tex, uint index);
-public:
-	using with_name::with_name;
 };
 
 namespace internal {
 
-template<internal::texture_target Tar, uint Dim>
-class texture_impl : public texture {
-	friend void gl::active_texture <> (texture_impl<Tar, Dim>& tex, uint index);
+template<>
+struct texture<none> : protected with_name {
+	using with_name::with_name;
+};
+
+template<texture_target Tar>
+struct texture<Tar> : protected texture<none> {
 protected:
+	template<gl::texture Texture>
+	friend void gl::active_texture(Texture& tex, uint index);
+	
 	static constexpr internal::texture_target target = Tar;
 
 	void bind() {
-		internal::bind_texture(target, name);
+		bind_texture(target, name);
 	}
 
 	int get_level_parameter_i(uint pname, int level = 0) {
 		int result;
 		bind();
-		internal::get_tex_level_parameteriv(target, level, pname, &result);
+		get_tex_level_parameteriv(target, level, pname, &result);
 		return result;
 	}
 
 	void parameter(uint pname, int value) {
 		bind();
-		gl::internal::tex_parameteri(target, pname, value);
+		tex_parameteri(target, pname, value);
 	}
-public:
-	using texture::texture;
 
-	texture_impl(texture_impl&&) = default;
-	texture_impl& operator=(texture_impl&&) = default;
+	using texture<none>::texture;
 
-	texture_impl() {
-		internal::gen_textures(1, &name);
+	texture() {
+		gen_textures(1, &name);
 		bind();
 	}
 
-	~texture_impl() {
+	~texture() {
 		if (name != invalid_name) {
-			internal::delete_textures(1, &name);
+			delete_textures(1, &name);
 			invalidate_name();
 		}
 	}
-
-	uint width() {
-		return get_level_parameter_i(0x1000);
-	}
-
-	std::enable_if_t<Dim >= 2, uint>
-	height() {
-		return get_level_parameter_i(0x1001);
-	}
-
-	void mag_filter(mag_filter filter) {
+public:
+	void mag_filter(filter filter) {
 		parameter(0x2800, (uint)filter);
 	}
 
-	void min_filter(min_filter filter) {
+	void min_filter(filter filter) {
 		parameter(0x2801, (uint)filter);
 	}
 
-	template<class T>
-	std::enable_if_t<Dim == 2>
-	image(int level, internal_format internalformat, uint width, uint height, pixel_format format, const T* data) {
-		bind();
-		gl::internal::tex_image_2d(
-			target,
-			level,
-			internalformat,
-			width,
-			height, 
-			0,
-			format,
-			internal::type_token<T>(),
-			data
+	void filter(filter filter) { min_filter(filter); mag_filter(filter); }
+};
+
+template<texture_target target>
+struct texture<target, 2> : texture<target, 0> {
+	using base = texture<target, 0>;
+
+	using base::base;
+
+	uint width() { return base::get_level_parameter_i(0x1000); }
+	uint height() { return base::get_level_parameter_i(0x1001); }
+	auto size() { return uni::vec2ui{width(), height()}; }
+
+	template<class T> requires std::is_arithmetic_v<T>
+	void image(int level, internal_format internalformat, uni::vec2ui size, pixel_format format, const T* data) {
+		base::bind();
+		tex_image_2d(
+			target, level, internalformat,
+			size.width, size.height, 0,
+			format, type_token<T>, data
 		);
 	}
 
 	template<class T>
-	std::enable_if_t<Dim == 2>
-	image(internal_format internalformat, uint width, uint height, pixel_format format, const T* data) {
-		image(0, internalformat, width, height, format, data);
+	void image(internal_format internalformat, uni::vec2ui size, pixel_format format, const T* data) {
+		image<T>(0, internalformat, size, format, data);
 	}
 
-	template<class Container>
-	std::enable_if_t<Dim == 2 && !std::is_pointer_v<Container>>
-	image(int level, internal_format internalformat, uint w, uint h, pixel_format format, const Container& data) {
-		image<typename Container::value_type>(
-			level,
-			internalformat,
-			w,
-			h,
-			format,
-			data.data()
+	template<std::ranges::random_access_range R>
+	void image(int level, internal_format internalformat, uni::vec2ui size, pixel_format format, const R& data) {
+		image<std::ranges::range_value_t<R>>(
+			level, internalformat, size, format, data.data()
 		);
 	}
 
-	template<class Container>
-	std::enable_if_t<Dim == 2 && !std::is_pointer_v<Container>>
-	image(internal_format internalformat, uint w, uint h, pixel_format format, const Container& data) {
-		image<Container>(0, internalformat, w, h, format, data);
+	template<std::ranges::random_access_range R>
+	void image(internal_format internalformat, uni::vec2ui size, pixel_format format, const R& data) {
+		image(0, internalformat, size, format, data);
 	}
 
 	template<class T>
-	std::enable_if_t<Dim == 2>
-	sub_image(int xoffset, int yoffset, int width, int height, pixel_format format, const T* data) {
-		bind();
-		gl::internal::tex_sub_image_2d(target, 0, xoffset, yoffset, width, height, format, internal::type_token<T>(), data);
+	void sub_image(int xoffset, int yoffset, int width, int height, pixel_format format, const T* data) {
+		base::bind();
+		tex_sub_image_2d(target, 0, xoffset, yoffset, width, height, format, type_token<T>, data);
 	}
 };
 
 }
 
-class texture_2d : public internal::texture_impl<internal::texture_target::texture_2d, 2> {
-public:
-	using internal::texture_impl<internal::texture_target::texture_2d, 2>::texture_impl;
-
-	template<class Dim2>
-		Dim2 size() {return Dim2{width(), height()};
-	}
+struct texture_2d : internal::texture<internal::texture_target::texture_2d, 2> {
+	using texture<internal::texture_target::texture_2d, 2>::texture;
 };
 
-template<internal::texture_target Tar, uint Dim>
-void active_texture(internal::texture_impl<Tar, Dim>& tex, uint index) {
+template<texture Texture>
+void active_texture(Texture& tex, uint index) {
 	internal::active_texture(0x84C0 + index);
 	tex.bind();
-	//internal::bind_texture(Tex::target, tex.name);
 }
 
 }

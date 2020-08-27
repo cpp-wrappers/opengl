@@ -30,6 +30,7 @@ void exec(vector<string> args) {
 	}
 	if(not before_header_def.empty())
 		cc.definition({before_header_def});
+	cc.include("../unified-math/include");
 	conf.apply(cc);
 	
 	path build_conf = "build/"+conf_name;

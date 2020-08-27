@@ -4,21 +4,23 @@
 #include <limits>
 #include "internal.hpp"
 
-using uint = unsigned;
-
 namespace gl {
+
+using name_t = unsigned;
 
 class with_name {
 
 protected:
-	static constexpr uint invalid_name = std::numeric_limits<uint>::max();
+	static constexpr name_t invalid_name = std::numeric_limits<unsigned>::max();
+
+	name_t name{ invalid_name };
 
 	void invalidate_name() {
 		name = invalid_name;
 	}
 public:
-	with_name() {}
-	with_name(uint name): name{ name } {}
+	with_name() = default;
+	with_name(name_t name): name{ name } {}
 	with_name(with_name&& o): name{ o.name } {
 		o.invalidate_name();
 	}
@@ -28,7 +30,5 @@ public:
 		o.invalidate_name();
 		return *this;
 	}
-
-	uint name{ invalid_name };
 };
 }

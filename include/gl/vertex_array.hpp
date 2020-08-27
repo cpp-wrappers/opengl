@@ -54,14 +54,14 @@ namespace gl {
 		void attrib_pointer(vertex_attribute::location location, array_buffer& buff, vertex_attribute::normalized normalized = false) {
 			bind();
 			buff.bind();
-			internal::vertex_attrib_pointer(location, size, internal::type_token<T>(), normalized, 0, nullptr);
+			internal::vertex_attrib_pointer(location, size, internal::type_token<T>, normalized, 0, nullptr);
 		}
 
 		template<class T, int size>
 		void attrib_i_pointer(vertex_attribute::location location, array_buffer& buff) {
 			bind();
 			buff.bind();
-			internal::vertex_attrib_i_pointer(location, size, internal::type_token<T>(), 0, nullptr);
+			internal::vertex_attrib_i_pointer(location, size, internal::type_token<T>, 0, nullptr);
 		}
 
 		uint attrib_size(uint index) {
@@ -73,7 +73,7 @@ namespace gl {
 
 		void bind_vertex_buffer(uint binding_index, buffer& buffer) {
 			bind();
-			internal::bind_vertex_buffer(binding_index, ((with_name&)buffer).name, 0, 0);
+			internal::bind_vertex_buffer(binding_index, buffer.name, 0, 0);
 		}
 
 		void enable_attrib_array(uint index) {
