@@ -26,8 +26,13 @@ namespace internal {
 	};
 }
 
-class texture;
-void active_texture(texture& tex, uint index);
+namespace internal {
+	template<internal::texture_target Tar, uint Dim>
+	class texture_impl;
+}
+
+template<internal::texture_target Tar, uint Dim>
+void active_texture(internal::texture_impl<Tar, Dim>& tex, uint index);
 
 enum internal_format : uint {
 	rgba8 = 0x8058
@@ -56,7 +61,7 @@ enum class min_filter {
 };
 
 class texture : protected with_name {
-	friend void active_texture(texture& tex, uint index);
+	//friend void active_texture(texture& tex, uint index);
 public:
 	using with_name::with_name;
 };
@@ -65,6 +70,7 @@ namespace internal {
 
 template<internal::texture_target Tar, uint Dim>
 class texture_impl : public texture {
+	friend void gl::active_texture <> (texture_impl<Tar, Dim>& tex, uint index);
 protected:
 	static constexpr internal::texture_target target = Tar;
 
@@ -119,8 +125,8 @@ public:
 	}
 
 	template<class T>
-	std::enable_if_t<Dim == 2 && std::is_pointer_v<T>>
-	image(int level, internal_format internalformat, uint width, uint height, pixel_format format, T data) {
+	std::enable_if_t<Dim == 2>
+	image(int level, internal_format internalformat, uint width, uint height, pixel_format format, const T* data) {
 		bind();
 		gl::internal::tex_image_2d(
 			target,
@@ -130,20 +136,21 @@ public:
 			height, 
 			0,
 			format,
-			internal::type_token<std::remove_pointer_t<T>>(), data
+			internal::type_token<T>(),
+			data
 		);
 	}
 
 	template<class T>
-	std::enable_if_t<Dim == 2 && std::is_pointer_v<T>>
-	image(internal_format internalformat, uint width, uint height, pixel_format format, T data) {
-		image<T>(0, internalformat, width, height, format, data);
+	std::enable_if_t<Dim == 2>
+	image(internal_format internalformat, uint width, uint height, pixel_format format, const T* data) {
+		image(0, internalformat, width, height, format, data);
 	}
 
 	template<class Container>
 	std::enable_if_t<Dim == 2 && !std::is_pointer_v<Container>>
-	image(int level, internal_format internalformat, uint w, uint h, pixel_format format, Container& data) {
-		image<typename std::add_pointer_t<typename Container::value_type>>(
+	image(int level, internal_format internalformat, uint w, uint h, pixel_format format, const Container& data) {
+		image<typename Container::value_type>(
 			level,
 			internalformat,
 			w,
@@ -155,13 +162,13 @@ public:
 
 	template<class Container>
 	std::enable_if_t<Dim == 2 && !std::is_pointer_v<Container>>
-	image(internal_format internalformat, uint w, uint h, pixel_format format, Container& data) {
+	image(internal_format internalformat, uint w, uint h, pixel_format format, const Container& data) {
 		image<Container>(0, internalformat, w, h, format, data);
 	}
 
 	template<class T>
 	std::enable_if_t<Dim == 2>
-	sub_image(int xoffset, int yoffset, int width, int height, pixel_format format, T* data) {
+	sub_image(int xoffset, int yoffset, int width, int height, pixel_format format, const T* data) {
 		bind();
 		gl::internal::tex_sub_image_2d(target, 0, xoffset, yoffset, width, height, format, internal::type_token<T>(), data);
 	}
@@ -178,10 +185,11 @@ public:
 	}
 };
 
-template<class Tex>
-void active_texture(Tex& tex, uint index) {
+template<internal::texture_target Tar, uint Dim>
+void active_texture(internal::texture_impl<Tar, Dim>& tex, uint index) {
 	internal::active_texture(0x84C0 + index);
 	tex.bind();
+	//internal::bind_texture(Tex::target, tex.name);
 }
 
 }

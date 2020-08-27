@@ -13,19 +13,29 @@ using namespace gcc_like_driver;
 
 void exec(vector<string> args) {
 	string conf_name;
-	gnu::clap clap;
-	clap.option("configuration", conf_name);
-	clap.parse(args);
+	string gl_header;
+	string before_header_def;
+	gnu::clap{}
+		.value("configuration", conf_name)
+		.value("header", gl_header)
+		.value("before-header-def", before_header_def)
+		.parse(args);
 
 	configuration conf = configuration::by_name(conf_name);
 
     auto cc = environment::cxx_compile_command_builder().std(cxx20).include("include");
+	if(not gl_header.empty()) {
+		gl_header="\\\""+gl_header+"\\\"";
+		cc.definition({"GL_ALL_INCLUE_HEADER", gl_header});
+	}
+	if(not before_header_def.empty())
+		cc.definition({before_header_def});
 	conf.apply(cc);
 	
 	path build_conf = "build/"+conf_name;
 	path objects = build_conf/"objects";
 
-	sources{ ranges::subrange{directory_iterator{"src"}, directory_iterator{}} }
+	source_set{ ranges::subrange{directory_iterator{"src"}, directory_iterator{}} }
 		.compile_to_objects(objects, cc)
 		.to_thin_static_lib(build_conf, "opengl-wrapper");
 }

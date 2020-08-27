@@ -4,10 +4,11 @@
 #include "vertex_array.hpp"
 #include <string>
 #include <stdexcept>
+#include <type_traits>
 #include "shader.hpp"
 
 namespace internal {
-template<
+/*template<
 	uint S,
 	uint V = S,
 	bool is =V*V==S
@@ -50,12 +51,24 @@ struct they_are_arithmetic
 
 template<class T1>
 struct they_are_arithmetic<T1> : std::bool_constant<std::is_arithmetic_v<T1>>{};
+*/
+/*template<class T>
+concept element_subs = std::is_arithmetic_v<std::remove_cvref_t<T>>;
 
 template<class T>
-struct vector {
+concept vector = requires(T t) {
+	{ t[0] } -> element_subs;
+};
+
+template<class T>
+concept matrix = requires(T t) {
+	{ t[0][0] } -> element_subs;
+};
+
+/*struct vector {
 	struct element {
 		using type =
-			typename std::remove_reference<
+			typename std::remove_cvref<
 				decltype(T{}[0])
 			>::type;
 
@@ -81,7 +94,7 @@ struct matrix {
 
 	struct size
 	: std::integral_constant<uint, sizeof(T) / element::size::value>{};
-};
+};*/
 
 }
 
@@ -189,84 +202,45 @@ namespace gl {
 			internal::draw_arrays(pt, start, count);
 		}
 
-		uint attrib_location(std::string attrib_name) const {
+		uint attrib_location(const std::string& attrib_name) const {
 			return internal::get_attribute_location(name, attrib_name.c_str());
 		}
 
-		uint uniform_location(std::string unifrom_name) const {
+		uint uniform_location(const std::string& unifrom_name) const {
 			return internal::get_uniform_location(name, unifrom_name.c_str());
 		}
 
-		uint u_loc(std::string uniform_name) const {
+		uint u_loc(const std::string& uniform_name) const {
 			return uniform_location(uniform_name);
 		}
 
-		template<class T, uint N, class... Ts>
-		std::enable_if_t<
-			::internal::they_are_arithmetic<T, Ts...>::value
-			&&
-			sizeof...(Ts) == N
-		>
-		uniform(uint location, Ts... ts) {
+		void uniform_matrix_4fv(unsigned loc, const float* data) {
 			use();
-			internal::uniform(location, ((T)ts)...);
+			internal::uniform_matrix_4fv(loc, 1, false, data);
 		}
 
-		template<class... Ts>
-		std::enable_if_t<
-			::internal::they_are_same<Ts...>::value
-			&&
-			std::is_arithmetic_v<typename ::internal::first<Ts...>::type>
-		>
-		uniform(uint location, Ts... ts) {
-			uniform<
-				typename ::internal::first<Ts...>::type,
-				sizeof...(Ts),
-				Ts...
-			>(location, ts...);
+		void uniform_1u(unsigned loc, unsigned val) {
+			use();
+			internal::uniform(loc, val);
 		}
 
-		template<class T, int N, class T0>
-		std::enable_if_t<
-			std::is_same_v<
-				T,
-				std::remove_reference_t<decltype(T0{}[0])>
-			>
-			//&&
-			//::internal::vector<T0>::size::value == N
-		>
-		uniform(uint location, T0 value) {
-			T* data = (T*)&value;
-
-			if constexpr (N == 1)uniform<T, N>(location, data[0]);
-			if constexpr (N == 2)uniform<T, N>(location, data[0], data[1]);
-			if constexpr (N == 3)uniform<T, N>(location, data[0], data[2], data[3]);
-			if constexpr (N == 4)uniform<T, N>(location, data[0], data[1], data[2], data[3]);
+		/*template<class T0, class... Ts>
+		requires (std::is_same_v<Ts, T0> && ...)
+		void uniform(uint location, T0 t0, Ts... ts) {
+			use();
+			internal::uniform(location, t0, ts...);
 		}
 
-		template<class T, class T0>
-		std::enable_if_t<
-			std::is_same_v<
-				T,
-				std::remove_reference_t<decltype(T0{}[0])>
-			>
-		>
-		uniform(uint location, T0 value) {
-			uniform<T, ::internal::vector<T0>::size::value, T0>(location, value);
+		template<class T>
+		void uniform(uint location, T value[]) {
+			if constexpr (sizeof(decltype(value)) == 1) uniform(location, value[0]);
+			if constexpr (sizeof(T) == 1) uniform(location, value[0], value[1]);
+			if constexpr (sizeof(T) == 1) uniform(location, value[0], value[2], value[3]);
+			if constexpr (sizeof(T) == 1) uniform(location, value[0], value[1], value[2], value[3]);
 		}
 
-		template<class T0>
-		std::enable_if_t<
-			std::is_arithmetic_v<
-				std::remove_reference_t<decltype(T0{}[0])>
-				//typename ::internal::vector<T0>::element::type
-			>
-		>
-		uniform(uint location, T0 value) {
-			uniform<
-				typename ::internal::vector<T0>::element::type,
-				T0
-			>(location, value);
+		void uniform(uint location, ::internal::element_subs auto value) {
+			uniform(location, value);
 		}
 
 		// Second type
@@ -293,6 +267,7 @@ namespace gl {
 
 		// Third type
 		template<class T, int C, int R, class T0>
+		requires(C==4 && R==4)
 		std::enable_if_t<
 			std::is_same_v<
 				T,
@@ -302,18 +277,8 @@ namespace gl {
 			//::internal::vector<T0>::size::value == C
 		>
 		uniform(uint location, uint count, bool transpose, const T0* value) const {
-			//static_assert(C*R * sizeof(T) == sizeof(T2));
 			use();
-
-			if constexpr (C == 4) {
-				if constexpr (R == 4) {
-					if constexpr (std::is_same_v<T, float>)
-					internal::uniform_matrix_4fv(location, count, transpose, (T*)value);
-					else throw std::exception();
-				}
-				else throw std::exception();
-			}
-			else throw std::exception();
+			internal::uniform_matrix_4fv(location, count, transpose, (T*)value);
 		}
 
 		template<class T, uint C, uint R, class T0>
@@ -365,19 +330,19 @@ namespace gl {
 		// Named
 
 		template<class T, int C, class... T0>
-		void uniform(std::string u_name, T0... ts) {
+		void uniform(const std::string& u_name, T0... ts) {
 			uniform<T, C, T0...>(u_loc(u_name), ts...);
 		}
 
 		template<class... T0>
-		void uniform(std::string u_name, T0... ts) {
+		void uniform(const std::string& u_name, T0... ts) {
 			uniform(u_loc(u_name), ts...);
 		}
 
 		template<class T, int C, int R, class... T0>
-		void uniform(std::string u_name, T0... ts) {
+		void uniform(const std::string& u_name, T0... ts) {
 			uniform<T, C, R, T0...>(u_loc(u_name), ts...);
-		}
+		}*/
 
 	};
 }

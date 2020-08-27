@@ -85,7 +85,7 @@ namespace gl {
 		template<class RAI>
 		void data(RAI begin, RAI end, gl::buffer_usage usage = gl::buffer_usage::static_draw) {
 			bind();
-			internal::buffer_data(target, std::distance(begin, end) * sizeof(std::iterator_traits<RAI>::value_type), &*begin, usage);
+			internal::buffer_data(target, std::distance(begin, end) * sizeof(std::iter_value_t<RAI>), &*begin, usage);
 		}
 
 		template<class Container>

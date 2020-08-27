@@ -1,9 +1,7 @@
 #include "gl/program.hpp"
 
-#ifdef GL_PROGRAM_INCLUDE_HEADER
-    GL_PROGRAM_INCLUDE_HEADER
-#elif GL_ALL_INCLUE_HEADER
-    GL_ALL_INCLUE_HEADER
+#ifdef GL_ALL_INCLUE_HEADER
+    #include GL_ALL_INCLUE_HEADER
 #else
     #define GL_GLEXT_PROTOTYPES
     #include "GL/glcorearb.h"
