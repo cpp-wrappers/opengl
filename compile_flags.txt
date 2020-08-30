@@ -1,3 +1,4 @@
 -std=c++20
 -Iinclude
 -I../unified-math/include
+-I../type-vector/include

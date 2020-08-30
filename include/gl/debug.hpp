@@ -3,14 +3,12 @@
 #include <functional>
 #include <string>
 
-using uint = unsigned;
-
 namespace gl {
 
-	enum message_source : uint {
+	enum message_source : unsigned {
 	};
 
-	enum message_type : uint {
+	enum message_type : unsigned {
 		error = 0x824C,
 		deprecated_behavior,
 		undefined_behavior,
@@ -25,11 +23,10 @@ namespace gl {
 	enum message_severity {
 	};
 
-	typedef void (debug_callback)(message_source source, message_type type, uint id,
-			message_severity severity, uint length, const char *message,
-			const void *user_param);
+	struct debug_message {
+		std::string_view what;
+	};
 
-	namespace internal {
-		void debug_message_callback(debug_callback, const void *user_param = nullptr);
-	}
+	using debug_message_callback_t = std::function<void(debug_message)>;
+	void debug_message_callback(debug_message_callback_t callback);
 }
