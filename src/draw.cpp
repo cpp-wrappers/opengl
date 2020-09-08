@@ -13,5 +13,5 @@ using namespace gl;
 void gl::internal::begin(unsigned mode) { glBegin(mode); }
 void gl::internal::end() { glEnd(); }
 
-void gl::internal::vertex(uni::vec2f v) { glVertex2f(v.x, v.y); }
-void gl::internal::normal(uni::vec2f v) { glNormal2f(v.x, v.y); }
+void gl::internal::vertex(float x, float y) { glVertex2f(x, y); }
+void gl::internal::normal(float x, float y, float z) { glNormal3f(x, y, z); }

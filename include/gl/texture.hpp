@@ -1,7 +1,7 @@
 #pragma once
 
 #include "with_name.hpp"
-#include "unified_math/vec.hpp"
+#include "unified_math/vec2.hpp"
 #include <type_traits>
 #include <ranges>
 
@@ -126,32 +126,33 @@ struct texture<target, 2> : texture<target, 0> {
 
 	uint width() { return base::get_level_parameter_i(0x1000); }
 	uint height() { return base::get_level_parameter_i(0x1001); }
-	auto size() { return uni::vec2ui{width(), height()}; }
+	template<uni::vec2ui Vec = uni::pair_f>
+	Vec size() { return {width(), height()}; }
 
 	template<class T> requires std::is_arithmetic_v<T>
-	void image(int level, internal_format internalformat, uni::vec2ui size, pixel_format format, const T* data) {
+	void image(int level, internal_format internalformat, uni::vec2ui auto size, pixel_format format, const T* data) {
 		base::bind();
 		tex_image_2d(
 			target, level, internalformat,
-			size.width, size.height, 0,
+			std::get<0>(size), std::get<1>(size), 0,
 			format, type_token<T>, data
 		);
 	}
 
 	template<class T>
-	void image(internal_format internalformat, uni::vec2ui size, pixel_format format, const T* data) {
+	void image(internal_format internalformat, uni::vec2ui auto size, pixel_format format, const T* data) {
 		image<T>(0, internalformat, size, format, data);
 	}
 
 	template<std::ranges::random_access_range R>
-	void image(int level, internal_format internalformat, uni::vec2ui size, pixel_format format, const R& data) {
+	void image(int level, internal_format internalformat, uni::vec2ui auto size, pixel_format format, const R& data) {
 		image<std::ranges::range_value_t<R>>(
 			level, internalformat, size, format, data.data()
 		);
 	}
 
 	template<std::ranges::random_access_range R>
-	void image(internal_format internalformat, uni::vec2ui size, pixel_format format, const R& data) {
+	void image(internal_format internalformat, uni::vec2ui auto size, pixel_format format, const R& data) {
 		image(0, internalformat, size, format, data);
 	}
 
